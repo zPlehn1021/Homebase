@@ -29,7 +29,7 @@ export const users = sqliteTable("users", {
   weeklyDigest: integer("weekly_digest", { mode: "boolean" })
     .notNull()
     .default(false),
-  emailVerified: text("emailVerified"),
+  emailVerified: integer("emailVerified", { mode: "timestamp_ms" }),
   image: text("image"),
 });
 
@@ -150,7 +150,7 @@ export const sessions = sqliteTable("sessions", {
   userId: integer("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  expires: text("expires").notNull(),
+  expires: integer("expires", { mode: "timestamp_ms" }).notNull(),
 });
 
 export const verificationTokens = sqliteTable(
@@ -158,7 +158,7 @@ export const verificationTokens = sqliteTable(
   {
     identifier: text("identifier").notNull(),
     token: text("token").notNull(),
-    expires: text("expires").notNull(),
+    expires: integer("expires", { mode: "timestamp_ms" }).notNull(),
   },
   (table) => [primaryKey({ columns: [table.identifier, table.token] })]
 );
