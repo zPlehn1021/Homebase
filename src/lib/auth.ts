@@ -16,7 +16,7 @@ const db = getDb();
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
-  debug: true,
+  debug: false,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   adapter: db
     ? DrizzleAdapter(db, {
@@ -31,7 +31,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     Resend({
       from: "Homebase <noreply@plehnlabs.com>",
     }),
-    Google,
+    Google({
+      checks: ["state"],
+    }),
   ],
   pages: {
     signIn: "/login",
