@@ -121,6 +121,86 @@ export const taskTemplates = sqliteTable("task_templates", {
   requiresFeature: text("requires_feature"),
 });
 
+// ── Inventory tables ────────────────────────────────────────────
+
+export const inventoryItems = sqliteTable("inventory_items", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  parentId: integer("parent_id"),
+  name: text("name").notNull(),
+  description: text("description"),
+  category: text("category", {
+    enum: [
+      "plumbing",
+      "electrical",
+      "hvac",
+      "exterior",
+      "interior",
+      "appliances",
+      "safety",
+      "other",
+    ],
+  }).notNull(),
+  location: text("location"),
+  manufacturer: text("manufacturer"),
+  modelNumber: text("model_number"),
+  serialNumber: text("serial_number"),
+  partNumber: text("part_number"),
+  purchaseDate: text("purchase_date"),
+  purchaseCost: integer("purchase_cost"), // cents
+  estimatedCost: integer("estimated_cost"), // cents, replacement value
+  warrantyExpiration: text("warranty_expiration"),
+  condition: text("condition", {
+    enum: ["new", "good", "fair", "poor", "needs-replacement"],
+  }),
+  installDate: text("install_date"),
+  notes: text("notes"),
+  customFields: text("custom_fields", { mode: "json" }).$type<
+    { label: string; value: string }[]
+  >(),
+  createdAt: text("created_at")
+    .notNull()
+    .default(sql`(datetime('now'))`),
+  updatedAt: text("updated_at")
+    .notNull()
+    .default(sql`(datetime('now'))`),
+});
+
+export const inventoryDocuments = sqliteTable("inventory_documents", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  inventoryItemId: integer("inventory_item_id")
+    .notNull()
+    .references(() => inventoryItems.id, { onDelete: "cascade" }),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  type: text("type", {
+    enum: ["warranty", "manual", "receipt", "photo", "other"],
+  }).notNull(),
+  url: text("url").notNull(),
+  fileSize: integer("file_size"),
+  mimeType: text("mime_type"),
+  uploadedAt: text("uploaded_at")
+    .notNull()
+    .default(sql`(datetime('now'))`),
+});
+
+export const taskInventoryLinks = sqliteTable(
+  "task_inventory_links",
+  {
+    taskId: integer("task_id")
+      .notNull()
+      .references(() => tasks.id, { onDelete: "cascade" }),
+    inventoryItemId: integer("inventory_item_id")
+      .notNull()
+      .references(() => inventoryItems.id, { onDelete: "cascade" }),
+  },
+  (table) => [primaryKey({ columns: [table.taskId, table.inventoryItemId] })]
+);
+
 // ── Auth.js tables ──────────────────────────────────────────────
 
 export const accounts = sqliteTable("accounts", {

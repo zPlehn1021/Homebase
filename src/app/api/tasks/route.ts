@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
-import { eq, like, and, gte, lte, or, asc } from "drizzle-orm";
-import { tasks, users } from "@/db/schema";
+import { eq, like, and, gte, lte, or, asc, inArray } from "drizzle-orm";
+import { tasks, users, taskInventoryLinks, inventoryItems } from "@/db/schema";
 import { getAuthenticatedUser } from "@/lib/auth-helpers";
 import { computeTaskStatus } from "@/lib/utils";
 import type { TaskStatus } from "@/lib/types";
@@ -49,10 +49,39 @@ export async function GET(request: NextRequest) {
       .where(and(...conditions))
       .orderBy(asc(tasks.dueDate));
 
+    // Get linked inventory items for all tasks
+    const taskIds = results.map((t) => t.id);
+    let linkedItemsMap = new Map<number, typeof inventoryItemRows>();
+    let inventoryItemRows: (typeof inventoryItems.$inferSelect)[] = [];
+
+    if (taskIds.length > 0) {
+      const links = await db
+        .select()
+        .from(taskInventoryLinks)
+        .where(inArray(taskInventoryLinks.taskId, taskIds));
+
+      const itemIds = [...new Set(links.map((l) => l.inventoryItemId))];
+      if (itemIds.length > 0) {
+        inventoryItemRows = await db
+          .select()
+          .from(inventoryItems)
+          .where(inArray(inventoryItems.id, itemIds));
+
+        const itemMap = new Map(inventoryItemRows.map((i) => [i.id, i]));
+        for (const link of links) {
+          const existing = linkedItemsMap.get(link.taskId) || [];
+          const item = itemMap.get(link.inventoryItemId);
+          if (item) existing.push(item);
+          linkedItemsMap.set(link.taskId, existing);
+        }
+      }
+    }
+
     // Compute status for each task
     const tasksWithStatus = results.map((t) => ({
       ...t,
       status: computeTaskStatus(t.dueDate, t.completedAt),
+      linkedItems: linkedItemsMap.get(t.id) || [],
     }));
 
     // Filter by computed status if requested

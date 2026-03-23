@@ -12,6 +12,7 @@ import {
   formatDate,
   formatDueLabel,
   computeTaskStatus,
+  inventoryCategoryIcons,
 } from "@/lib/utils";
 
 const statusBorderColors = {
@@ -162,6 +163,31 @@ export function TaskCard({
               </div>
             )}
           </div>
+
+          {/* Linked Inventory Items */}
+          {task.linkedItems && task.linkedItems.length > 0 && (
+            <div>
+              <p className="text-xs font-medium text-stone-500 mb-1.5">Linked Items</p>
+              <div className="space-y-1">
+                {task.linkedItems.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-stone-50 border border-stone-100"
+                  >
+                    <span className="text-sm">{inventoryCategoryIcons[item.category]}</span>
+                    <span className="text-xs font-medium text-stone-700 truncate flex-1">
+                      {item.name}
+                    </span>
+                    {item.partNumber && (
+                      <span className="text-[10px] text-stone-400 font-mono">
+                        {item.partNumber}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Actions */}
           {!isCompleted && (

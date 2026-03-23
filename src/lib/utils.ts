@@ -1,4 +1,4 @@
-import type { TaskStatus, TaskCategory, SnoozeDuration } from "./types";
+import type { TaskStatus, TaskCategory, SnoozeDuration, InventoryCategory, ItemCondition } from "./types";
 
 export function computeTaskStatus(
   dueDate: string | null,
@@ -128,3 +128,66 @@ export const allFrequencies: { value: string; label: string }[] = [
   { value: "annually", label: "Annually" },
   { value: "one-time", label: "One-Time" },
 ];
+
+// ── Inventory utilities ─────────────────────────────────────────
+
+export const inventoryCategoryIcons: Record<InventoryCategory, string> = {
+  plumbing: "🔧",
+  electrical: "⚡",
+  hvac: "🌡️",
+  exterior: "🏠",
+  interior: "🪑",
+  appliances: "🔌",
+  safety: "🛡️",
+  other: "📦",
+};
+
+export const inventoryCategoryColors: Record<InventoryCategory, string> = {
+  plumbing: "bg-blue-50 text-blue-700 border-blue-200",
+  electrical: "bg-amber-50 text-amber-700 border-amber-200",
+  hvac: "bg-orange-50 text-orange-700 border-orange-200",
+  exterior: "bg-sage-50 text-sage-700 border-sage-200",
+  interior: "bg-stone-100 text-stone-600 border-stone-300",
+  appliances: "bg-stone-50 text-stone-700 border-stone-200",
+  safety: "bg-rose-50 text-rose-700 border-rose-200",
+  other: "bg-stone-50 text-stone-600 border-stone-200",
+};
+
+export const allInventoryCategories: InventoryCategory[] = [
+  "plumbing",
+  "electrical",
+  "hvac",
+  "exterior",
+  "interior",
+  "appliances",
+  "safety",
+  "other",
+];
+
+export const conditionLabels: Record<ItemCondition, string> = {
+  new: "New",
+  good: "Good",
+  fair: "Fair",
+  poor: "Poor",
+  "needs-replacement": "Needs Replacement",
+};
+
+export const conditionColors: Record<ItemCondition, string> = {
+  new: "bg-green-50 text-green-700 border-green-200",
+  good: "bg-sage-50 text-sage-700 border-sage-200",
+  fair: "bg-amber-50 text-amber-700 border-amber-200",
+  poor: "bg-orange-50 text-orange-700 border-orange-200",
+  "needs-replacement": "bg-rose-50 text-rose-700 border-rose-200",
+};
+
+export const allConditions: ItemCondition[] = [
+  "new",
+  "good",
+  "fair",
+  "poor",
+  "needs-replacement",
+];
+
+export function formatCurrency(cents: number): string {
+  return `$${(cents / 100).toFixed(2)}`;
+}

@@ -44,8 +44,8 @@ export async function POST(request: Request) {
     const payload = JSON.parse(rawBody);
     const eventName = payload.meta?.event_name;
 
-    // Only handle order_completed events
-    if (eventName !== "order_completed") {
+    // Handle order_created (LemonSqueezy sends this when payment succeeds)
+    if (eventName !== "order_created") {
       return Response.json({ received: true });
     }
 
