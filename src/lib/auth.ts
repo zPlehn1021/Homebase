@@ -27,7 +27,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   session: { strategy: "database" },
   providers: [
     Resend({
-      from: "Homebase <noreply@homebase.app>",
+      from: "Homebase <noreply@plehnlabs.com>",
     }),
     Google,
   ],
