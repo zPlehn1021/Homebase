@@ -14,9 +14,30 @@ import { eq } from "drizzle-orm";
 
 const db = getDb();
 
+const useSecureCookies = process.env.AUTH_URL?.startsWith("https://") ?? false;
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
-  debug: false,
+  cookies: {
+    pkceCodeVerifier: {
+      name: "authjs.pkce.code_verifier",
+      options: {
+        httpOnly: true,
+        sameSite: "none",
+        path: "/",
+        secure: true,
+      },
+    },
+    state: {
+      name: "authjs.state",
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: useSecureCookies,
+      },
+    },
+  },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   adapter: db
     ? DrizzleAdapter(db, {
@@ -31,9 +52,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     Resend({
       from: "Homebase <noreply@plehnlabs.com>",
     }),
-    Google({
-      checks: ["state"],
-    }),
+    Google,
   ],
   pages: {
     signIn: "/login",
