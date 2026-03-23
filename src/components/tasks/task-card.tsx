@@ -13,6 +13,7 @@ import {
   formatDueLabel,
   computeTaskStatus,
   inventoryCategoryIcons,
+  formatCurrency,
 } from "@/lib/utils";
 
 const statusBorderColors = {
@@ -181,6 +182,11 @@ export function TaskCard({
                     {item.partNumber && (
                       <span className="text-[10px] text-stone-400 font-mono">
                         {item.partNumber}
+                      </span>
+                    )}
+                    {item.purchaseCost != null && (
+                      <span className="text-[10px] text-stone-400">
+                        {formatCurrency(item.purchaseCost)}
                       </span>
                     )}
                   </div>

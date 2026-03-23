@@ -3,10 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 
-const CHECKOUT_URL =
-  process.env.NEXT_PUBLIC_LEMONSQUEEZY_CHECKOUT_URL || "/#pricing";
-
-export function LandingNav() {
+export function LandingNav({ checkoutUrl }: { checkoutUrl: string }) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
@@ -48,7 +45,7 @@ export function LandingNav() {
               Log In
             </Link>
             <a
-              href={CHECKOUT_URL}
+              href={checkoutUrl}
               className="px-4 py-2 rounded-xl bg-sage-600 text-white text-sm font-semibold hover:bg-sage-700 transition-colors shadow-sm"
             >
               Get Started
@@ -118,7 +115,7 @@ export function LandingNav() {
             Log In
           </Link>
           <a
-            href={CHECKOUT_URL}
+            href={checkoutUrl}
             className="block mt-2 text-center px-4 py-2.5 rounded-xl bg-sage-600 text-white text-sm font-semibold hover:bg-sage-700 transition-colors"
           >
             Get Started

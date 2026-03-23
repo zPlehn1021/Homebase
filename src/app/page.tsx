@@ -145,7 +145,7 @@ export default function LandingPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <LandingNav />
+      <LandingNav checkoutUrl={CHECKOUT_URL} />
 
       {/* ════════════════════ HERO ════════════════════ */}
       <section className="relative overflow-hidden">

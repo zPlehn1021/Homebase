@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import type { Task, UpdateTaskInput, TaskCategory, TaskFrequency } from "@/lib/types";
-import { allCategories, allFrequencies, categoryIcons } from "@/lib/utils";
+import type { Task, UpdateTaskInput, TaskCategory, TaskFrequency, InventoryItem } from "@/lib/types";
+import { allCategories, allFrequencies, categoryIcons, inventoryCategoryIcons, formatCurrency } from "@/lib/utils";
 import { FocusTrap } from "@/components/ui/focus-trap";
 
 export function EditTaskModal({
@@ -24,6 +24,46 @@ export function EditTaskModal({
     task.estimatedCost?.toString() || ""
   );
   const [notes, setNotes] = useState(task.notes || "");
+  const [allItems, setAllItems] = useState<InventoryItem[]>([]);
+  const [linkedItems, setLinkedItems] = useState<InventoryItem[]>(
+    task.linkedItems || []
+  );
+
+  useEffect(() => {
+    fetch("/api/inventory")
+      .then((r) => r.json())
+      .then((data) => setAllItems(Array.isArray(data) ? data : []))
+      .catch(() => {});
+  }, []);
+
+  const linkItem = async (itemId: number) => {
+    const item = allItems.find((i) => i.id === itemId);
+    if (!item || linkedItems.some((i) => i.id === itemId)) return;
+    try {
+      const res = await fetch(`/api/inventory/${itemId}/links`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ taskId: task.id }),
+      });
+      if (!res.ok) throw new Error();
+      setLinkedItems((prev) => [...prev, item]);
+    } catch {
+      toast.error("Failed to link item");
+    }
+  };
+
+  const unlinkItem = async (itemId: number) => {
+    try {
+      const res = await fetch(
+        `/api/inventory/${itemId}/links?taskId=${task.id}`,
+        { method: "DELETE" }
+      );
+      if (!res.ok) throw new Error();
+      setLinkedItems((prev) => prev.filter((i) => i.id !== itemId));
+    } catch {
+      toast.error("Failed to unlink item");
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -203,6 +243,78 @@ export function EditTaskModal({
                 placeholder="Any additional notes..."
                 className="w-full px-3 py-2.5 rounded-xl border border-stone-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-sage-200 focus:border-sage-300 resize-none"
               />
+            </div>
+
+            {/* Linked Inventory Items */}
+            <div>
+              <label className="block text-xs font-medium text-stone-500 mb-1">
+                Linked Inventory
+              </label>
+              {linkedItems.length > 0 && (
+                <div className="space-y-1.5 mb-2">
+                  {linkedItems.map((item) => (
+                    <div
+                      key={item.id}
+                      className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-white border border-stone-200"
+                    >
+                      <span className="text-sm">
+                        {inventoryCategoryIcons[item.category]}
+                      </span>
+                      <span className="text-xs font-medium text-stone-700 truncate flex-1">
+                        {item.name}
+                      </span>
+                      {item.partNumber && (
+                        <span className="text-[10px] text-stone-400 font-mono">
+                          {item.partNumber}
+                        </span>
+                      )}
+                      {item.purchaseCost != null && (
+                        <span className="text-[10px] text-stone-400">
+                          {formatCurrency(item.purchaseCost)}
+                        </span>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => unlinkItem(item.id)}
+                        className="p-0.5 rounded hover:bg-rose-50 text-stone-300 hover:text-rose-500"
+                        aria-label={`Unlink ${item.name}`}
+                      >
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 14 14"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                        >
+                          <path d="M3 3l8 8M11 3l-8 8" />
+                        </svg>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {allItems.length > 0 && (
+                <select
+                  value=""
+                  onChange={(e) => {
+                    const id = parseInt(e.target.value, 10);
+                    if (id) linkItem(id);
+                  }}
+                  className="w-full px-3 py-2 rounded-xl border border-stone-200 bg-white text-xs text-stone-500 focus:outline-none focus:ring-2 focus:ring-sage-200 focus:border-sage-300"
+                >
+                  <option value="">+ Link an inventory item...</option>
+                  {allItems
+                    .filter((item) => !linkedItems.some((l) => l.id === item.id))
+                    .map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {inventoryCategoryIcons[item.category]} {item.name}
+                        {item.partNumber ? ` (${item.partNumber})` : ""}
+                      </option>
+                    ))}
+                </select>
+              )}
             </div>
 
             {/* Actions */}
