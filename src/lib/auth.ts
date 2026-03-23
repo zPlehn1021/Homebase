@@ -62,6 +62,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     verifyRequest: "/login?verify=true",
   },
   callbacks: {
+    async redirect({ url, baseUrl }) {
+      // After sign-in, go to dashboard (not landing page)
+      if (url === baseUrl || url === baseUrl + "/") {
+        return `${baseUrl}/dashboard`;
+      }
+      // Allow relative URLs
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      // Allow URLs on the same origin
+      if (url.startsWith(baseUrl)) return url;
+      return `${baseUrl}/dashboard`;
+    },
     async session({ session, user }) {
       if (db && user?.id) {
         const dbUser = await db
