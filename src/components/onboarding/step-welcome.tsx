@@ -30,7 +30,10 @@ export function StepWelcome({
             <span className="text-sage-600">②</span> Select your home systems
           </li>
           <li className="flex items-center gap-2">
-            <span className="text-sage-600">③</span> Get your personalized plan
+            <span className="text-sage-600">③</span> Review &amp; customize your plan
+          </li>
+          <li className="flex items-center gap-2">
+            <span className="text-sage-600">④</span> You&apos;re all set!
           </li>
         </ul>
       </div>

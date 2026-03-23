@@ -2,18 +2,19 @@
 
 import { useState, useMemo } from "react";
 import { useTasks } from "@/lib/hooks/use-tasks";
-import type { TaskStatus, TaskCategory } from "@/lib/types";
+import type { Task, TaskStatus, TaskCategory } from "@/lib/types";
 import { computeTaskStatus } from "@/lib/utils";
 import { TaskTabs } from "@/components/tasks/task-tabs";
 import { CategoryFilter } from "@/components/tasks/category-filter";
 import { SearchBar } from "@/components/tasks/search-bar";
 import { TaskCard } from "@/components/tasks/task-card";
 import { AddTaskModal } from "@/components/tasks/add-task-modal";
+import { EditTaskModal } from "@/components/tasks/edit-task-modal";
 import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
 
 export default function TasksPage() {
-  const { tasks, loading, createTask, completeTask, snoozeTask, deleteTask, fetchTasks } =
+  const { tasks, loading, createTask, updateTask, completeTask, snoozeTask, deleteTask, fetchTasks } =
     useTasks();
   const [activeTab, setActiveTab] = useState<TaskStatus | "all">("all");
   const [categoryFilter, setCategoryFilter] = useState<TaskCategory | null>(
@@ -22,6 +23,7 @@ export default function TasksPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
 
   // Filter tasks client-side for instant UI
   const filteredTasks = useMemo(() => {
@@ -136,7 +138,8 @@ export default function TasksPage() {
               }
               onComplete={(cost) => completeTask(task.id, cost)}
               onSnooze={(dur) => snoozeTask(task.id, dur)}
-              onDelete={task.isCustom ? () => deleteTask(task.id) : undefined}
+              onDelete={() => deleteTask(task.id)}
+              onEdit={() => setEditingTask(task)}
             />
           ))}
         </div>
@@ -151,6 +154,18 @@ export default function TasksPage() {
             fetchTasks();
           }}
           onClose={() => setShowAddModal(false)}
+        />
+      )}
+
+      {/* Edit Task Modal */}
+      {editingTask && (
+        <EditTaskModal
+          task={editingTask}
+          onSubmit={async (id, input) => {
+            await updateTask(id, input);
+            setEditingTask(null);
+          }}
+          onClose={() => setEditingTask(null)}
         />
       )}
     </div>

@@ -25,8 +25,8 @@ export interface MockTask {
 }
 
 export const mockUser = {
-  name: "Jordan",
-  email: "jordan@example.com",
+  name: "Homeowner",
+  email: "user@example.com",
   propertyType: "house" as const,
   homeAgeYears: 12,
   squareFootage: 2400,

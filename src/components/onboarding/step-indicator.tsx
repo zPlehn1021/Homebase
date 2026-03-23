@@ -1,4 +1,4 @@
-const stepLabels = ["Welcome", "Your Home", "Systems", "All Set"];
+const stepLabels = ["Welcome", "Your Home", "Systems", "Review", "All Set"];
 
 export function StepIndicator({ currentStep }: { currentStep: number }) {
   return (

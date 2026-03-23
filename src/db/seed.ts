@@ -106,26 +106,6 @@ const templates: (typeof taskTemplates.$inferInsert)[] = [
     appliesTo: housesOnly,
     priority: "medium",
   },
-  {
-    title: "Service lawn mower",
-    description:
-      "Change oil, replace spark plug, sharpen blade, and clean air filter.",
-    category: "yard",
-    frequency: "annually",
-    monthDue: 3,
-    appliesTo: withYard,
-    priority: "low",
-  },
-  {
-    title: "Check window and door screens",
-    description:
-      "Inspect screens for holes or damage, repair or replace as needed before bug season.",
-    category: "exterior",
-    frequency: "annually",
-    monthDue: 4,
-    appliesTo: allPropertyTypes,
-    priority: "low",
-  },
 
   // ── SUMMER (months 6-8) ──────────────────────────────────────────
   {
@@ -178,16 +158,6 @@ const templates: (typeof taskTemplates.$inferInsert)[] = [
     appliesTo: housesOnly,
     priority: "medium",
   },
-  {
-    title: "Clean and inspect garage door",
-    description:
-      "Lubricate tracks and hinges, test auto-reverse safety, check weatherstripping.",
-    category: "exterior",
-    frequency: "annually",
-    monthDue: 7,
-    appliesTo: housesOnly,
-    priority: "low",
-  },
 
   // ── FALL (months 9-11) ───────────────────────────────────────────
   {
@@ -210,16 +180,6 @@ const templates: (typeof taskTemplates.$inferInsert)[] = [
     appliesTo: housesOnly,
     priority: "high",
     requiresFeature: "fireplace",
-  },
-  {
-    title: "Reverse ceiling fan direction",
-    description:
-      "Switch ceiling fans to clockwise (winter mode) to push warm air down from the ceiling.",
-    category: "interior",
-    frequency: "semi-annually",
-    monthDue: 10,
-    appliesTo: allPropertyTypes,
-    priority: "low",
   },
   {
     title: "Overseed and fertilize lawn (fall)",
@@ -272,16 +232,6 @@ const templates: (typeof taskTemplates.$inferInsert)[] = [
     priority: "high",
     requiresFeature: "sprinkler",
   },
-  {
-    title: "Aerate lawn",
-    description:
-      "Core aerate to reduce soil compaction and improve root growth before winter.",
-    category: "yard",
-    frequency: "annually",
-    monthDue: 9,
-    appliesTo: withYard,
-    priority: "low",
-  },
 
   // ── WINTER (months 12, 1-2) ──────────────────────────────────────
   {
@@ -315,16 +265,6 @@ const templates: (typeof taskTemplates.$inferInsert)[] = [
     priority: "high",
   },
   {
-    title: "Bleed radiators",
-    description:
-      "Release trapped air from radiators to restore even heating. Check boiler pressure afterward.",
-    category: "hvac",
-    frequency: "annually",
-    monthDue: 12,
-    appliesTo: allPropertyTypes,
-    priority: "medium",
-  },
-  {
     title: "Inspect attic insulation",
     description:
       "Check insulation depth and condition, look for moisture, pests, or gaps around penetrations.",
@@ -351,7 +291,7 @@ const templates: (typeof taskTemplates.$inferInsert)[] = [
     description:
       "Replace or clean HVAC air filters for better air quality and system efficiency.",
     category: "hvac",
-    frequency: "monthly",
+    frequency: "quarterly",
     monthDue: null,
     appliesTo: allPropertyTypes,
     priority: "high",
@@ -361,10 +301,11 @@ const templates: (typeof taskTemplates.$inferInsert)[] = [
     description:
       "Inspect brine tank and refill salt as needed. Clean tank if salt bridge has formed.",
     category: "plumbing",
-    frequency: "monthly",
+    frequency: "quarterly",
     monthDue: null,
     appliesTo: housesOnly,
     priority: "low",
+    requiresFeature: "water_softener",
   },
   {
     title: "Inspect fire extinguishers",
@@ -415,16 +356,6 @@ const templates: (typeof taskTemplates.$inferInsert)[] = [
     monthDue: null,
     appliesTo: allPropertyTypes,
     priority: "medium",
-  },
-  {
-    title: "Lubricate door hinges and locks",
-    description:
-      "Apply lubricant to all door hinges, deadbolts, and lock cylinders to prevent sticking.",
-    category: "interior",
-    frequency: "annually",
-    monthDue: null,
-    appliesTo: allPropertyTypes,
-    priority: "low",
   },
   {
     title: "Deep clean dishwasher",

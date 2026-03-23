@@ -28,6 +28,7 @@ export function TaskCard({
   onComplete,
   onSnooze,
   onDelete,
+  onEdit,
 }: {
   task: Task;
   expanded: boolean;
@@ -35,6 +36,7 @@ export function TaskCard({
   onComplete: (actualCost?: number) => void;
   onSnooze: (duration: SnoozeDuration) => void;
   onDelete?: () => void;
+  onEdit?: () => void;
 }) {
   const { data: rawSession } = useSession();
   const isPurchased = (rawSession as HomebaseSession | null)?.user?.purchaseVerified ?? true;
@@ -230,6 +232,18 @@ export function TaskCard({
                 </div>
               )}
 
+              {/* Edit */}
+              {onEdit && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit();
+                  }}
+                  className="px-3 py-1.5 rounded-xl border border-stone-200 text-stone-500 text-xs font-medium hover:bg-stone-50 transition-colors"
+                >
+                  Edit
+                </button>
+              )}
               {/* Snooze */}
               <div className="relative">
                 <button
@@ -267,8 +281,8 @@ export function TaskCard({
                 )}
               </div>
 
-              {/* Delete (custom tasks only) */}
-              {task.isCustom && onDelete && !showDeleteConfirm && (
+              {/* Delete */}
+              {onDelete && !showDeleteConfirm && (
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -279,7 +293,7 @@ export function TaskCard({
                   Delete
                 </button>
               )}
-              {task.isCustom && onDelete && showDeleteConfirm && (
+              {onDelete && showDeleteConfirm && (
                 <div className="flex items-center gap-2 ml-auto bg-rose-50 rounded-xl px-3 py-1.5 border border-rose-200">
                   <span className="text-xs text-rose-600">Delete this task?</span>
                   <button

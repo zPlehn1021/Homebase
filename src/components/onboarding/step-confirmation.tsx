@@ -11,6 +11,7 @@ interface ConfirmationProps {
   homeAge: number;
   squareFootage: number;
   homeFeatures: string[];
+  excludedTitles?: string[];
 }
 
 const propertyLabels: Record<string, string> = {
@@ -36,6 +37,7 @@ export function StepConfirmation({
   homeAge,
   squareFootage,
   homeFeatures,
+  excludedTitles = [],
 }: ConfirmationProps) {
   const router = useRouter();
   const [status, setStatus] = useState<"saving" | "generating" | "done" | "error">("saving");
@@ -69,7 +71,7 @@ export function StepConfirmation({
         const genRes = await fetch("/api/tasks/generate", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ homeFeatures }),
+          body: JSON.stringify({ homeFeatures, excludedTitles }),
         });
         if (!genRes.ok) throw new Error("Failed to generate tasks");
         const genData = await genRes.json();
@@ -94,7 +96,8 @@ export function StepConfirmation({
 
     run();
     return () => { cancelled = true; };
-  }, [propertyType, homeAge, squareFootage, homeFeatures]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [propertyType, homeAge, squareFootage, homeFeatures, excludedTitles]);
 
   if (status === "saving" || status === "generating") {
     return (
@@ -128,7 +131,7 @@ export function StepConfirmation({
           </p>
         </div>
         <button
-          onClick={() => router.push("/")}
+          onClick={() => window.location.href = "/dashboard"}
           className="px-6 py-2.5 rounded-xl text-sm font-semibold bg-sage-600 text-white hover:bg-sage-700 transition-colors"
         >
           Go to Dashboard
@@ -211,7 +214,7 @@ export function StepConfirmation({
       {/* CTA */}
       <div className="text-center pt-2">
         <button
-          onClick={() => router.push("/")}
+          onClick={() => window.location.href = "/dashboard"}
           className="px-8 py-3 bg-sage-600 text-white font-semibold rounded-xl hover:bg-sage-700 transition-colors text-base shadow-sm"
         >
           Go to Dashboard →

@@ -6,6 +6,7 @@ import { StepIndicator } from "@/components/onboarding/step-indicator";
 import { StepWelcome } from "@/components/onboarding/step-welcome";
 import { StepHomeProfile } from "@/components/onboarding/step-home-profile";
 import { StepHomeSystems } from "@/components/onboarding/step-home-systems";
+import { StepTaskReview } from "@/components/onboarding/step-task-review";
 import { StepConfirmation } from "@/components/onboarding/step-confirmation";
 
 export default function OnboardingPage() {
@@ -17,6 +18,7 @@ export default function OnboardingPage() {
   const [homeAge, setHomeAge] = useState<number | null>(null);
   const [squareFootage, setSquareFootage] = useState<number | null>(null);
   const [homeFeatures, setHomeFeatures] = useState<string[]>([]);
+  const [excludedTitles, setExcludedTitles] = useState<string[]>([]);
 
   const toggleFeature = useCallback((feature: string) => {
     setHomeFeatures((prev) =>
@@ -48,12 +50,12 @@ export default function OnboardingPage() {
         body: JSON.stringify({ homeFeatures: [] }),
       });
 
-      router.push("/");
+      window.location.href = "/dashboard";
     } catch {
       // If API fails, still navigate — mock mode will handle it
-      router.push("/");
+      window.location.href = "/dashboard";
     }
-  }, [router]);
+  }, []);
 
   return (
     <div className="py-8">
@@ -86,11 +88,23 @@ export default function OnboardingPage() {
       )}
 
       {step === 4 && (
+        <StepTaskReview
+          propertyType={propertyType || "house"}
+          homeFeatures={homeFeatures}
+          excludedTitles={excludedTitles}
+          onExcludedChange={setExcludedTitles}
+          onNext={() => setStep(5)}
+          onBack={() => setStep(3)}
+        />
+      )}
+
+      {step === 5 && (
         <StepConfirmation
           propertyType={propertyType || "house"}
           homeAge={homeAge || 10}
           squareFootage={squareFootage || 2000}
           homeFeatures={homeFeatures}
+          excludedTitles={excludedTitles}
         />
       )}
     </div>
