@@ -1,19 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import type { HomebaseSession } from "@/lib/auth.d";
-import type { CreateTaskInput, TaskCategory, TaskFrequency } from "@/lib/types";
-import { allCategories, allFrequencies, categoryIcons } from "@/lib/utils";
+import type { CreateTaskInput, TaskCategory, TaskFrequency, InventoryItem } from "@/lib/types";
+import { allCategories, allFrequencies, categoryIcons, inventoryCategoryIcons, formatCurrency } from "@/lib/utils";
 import { FocusTrap } from "@/components/ui/focus-trap";
 
 export function AddTaskModal({
   onSubmit,
   onClose,
 }: {
-  onSubmit: (input: CreateTaskInput) => void;
+  onSubmit: (input: CreateTaskInput, linkedItemIds: number[]) => void;
   onClose: () => void;
 }) {
   const { data: rawSession } = useSession();
@@ -27,20 +27,32 @@ export function AddTaskModal({
   );
   const [estimatedCost, setEstimatedCost] = useState("");
   const [notes, setNotes] = useState("");
+  const [allItems, setAllItems] = useState<InventoryItem[]>([]);
+  const [selectedItemIds, setSelectedItemIds] = useState<number[]>([]);
+
+  useEffect(() => {
+    fetch("/api/inventory")
+      .then((r) => r.json())
+      .then((data) => setAllItems(Array.isArray(data) ? data : []))
+      .catch(() => {});
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) return;
     toast.success("Task created");
-    onSubmit({
-      title: title.trim(),
-      description: description.trim() || undefined,
-      category,
-      frequency,
-      dueDate,
-      estimatedCost: estimatedCost ? parseInt(estimatedCost, 10) : undefined,
-      notes: notes.trim() || undefined,
-    });
+    onSubmit(
+      {
+        title: title.trim(),
+        description: description.trim() || undefined,
+        category,
+        frequency,
+        dueDate,
+        estimatedCost: estimatedCost ? parseInt(estimatedCost, 10) : undefined,
+        notes: notes.trim() || undefined,
+      },
+      selectedItemIds
+    );
   };
 
   return (
@@ -178,6 +190,88 @@ export function AddTaskModal({
               className="w-full px-3 py-2.5 rounded-xl border border-stone-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-sage-200 focus:border-sage-300 resize-none"
             />
           </div>
+
+          {/* Link Inventory */}
+          {allItems.length > 0 && (
+            <div>
+              <label className="block text-xs font-medium text-stone-500 mb-1">
+                Link Inventory
+              </label>
+              {selectedItemIds.length > 0 && (
+                <div className="space-y-1.5 mb-2">
+                  {selectedItemIds.map((id) => {
+                    const item = allItems.find((i) => i.id === id);
+                    if (!item) return null;
+                    return (
+                      <div
+                        key={id}
+                        className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-white border border-stone-200"
+                      >
+                        <span className="text-sm">
+                          {inventoryCategoryIcons[item.category]}
+                        </span>
+                        <span className="text-xs font-medium text-stone-700 truncate flex-1">
+                          {item.name}
+                        </span>
+                        {item.partNumber && (
+                          <span className="text-[10px] text-stone-400 font-mono">
+                            {item.partNumber}
+                          </span>
+                        )}
+                        {item.purchaseCost != null && (
+                          <span className="text-[10px] text-stone-400">
+                            {formatCurrency(item.purchaseCost)}
+                          </span>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setSelectedItemIds((prev) =>
+                              prev.filter((i) => i !== id)
+                            )
+                          }
+                          className="p-0.5 rounded hover:bg-rose-50 text-stone-300 hover:text-rose-500"
+                          aria-label={`Remove ${item.name}`}
+                        >
+                          <svg
+                            width="14"
+                            height="14"
+                            viewBox="0 0 14 14"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                          >
+                            <path d="M3 3l8 8M11 3l-8 8" />
+                          </svg>
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+              <select
+                value=""
+                onChange={(e) => {
+                  const id = parseInt(e.target.value, 10);
+                  if (id && !selectedItemIds.includes(id)) {
+                    setSelectedItemIds((prev) => [...prev, id]);
+                  }
+                }}
+                className="w-full px-3 py-2 rounded-xl border border-stone-200 bg-white text-xs text-stone-500 focus:outline-none focus:ring-2 focus:ring-sage-200 focus:border-sage-300"
+              >
+                <option value="">+ Link an inventory item...</option>
+                {allItems
+                  .filter((item) => !selectedItemIds.includes(item.id))
+                  .map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {inventoryCategoryIcons[item.category]} {item.name}
+                      {item.partNumber ? ` (${item.partNumber})` : ""}
+                    </option>
+                  ))}
+              </select>
+            </div>
+          )}
 
           {/* Actions */}
           {!isPurchased && (

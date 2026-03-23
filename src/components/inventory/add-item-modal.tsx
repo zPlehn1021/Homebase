@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
@@ -9,12 +9,14 @@ import type {
   CreateInventoryItemInput,
   InventoryCategory,
   ItemCondition,
+  Task,
 } from "@/lib/types";
 import {
   allInventoryCategories,
   inventoryCategoryIcons,
   allConditions,
   conditionLabels,
+  categoryIcons,
 } from "@/lib/utils";
 import { FocusTrap } from "@/components/ui/focus-trap";
 
@@ -23,7 +25,7 @@ export function AddItemModal({
   onClose,
   defaultParentId,
 }: {
-  onSubmit: (input: CreateInventoryItemInput) => void;
+  onSubmit: (input: CreateInventoryItemInput, linkedTaskIds: number[]) => void;
   onClose: () => void;
   defaultParentId?: number;
 }) {
@@ -43,26 +45,38 @@ export function AddItemModal({
   const [purchaseCost, setPurchaseCost] = useState("");
   const [condition, setCondition] = useState<ItemCondition | "">("");
   const [notes, setNotes] = useState("");
+  const [allTasks, setAllTasks] = useState<Task[]>([]);
+  const [selectedTaskIds, setSelectedTaskIds] = useState<number[]>([]);
+
+  useEffect(() => {
+    fetch("/api/tasks")
+      .then((r) => r.json())
+      .then((data) => setAllTasks(Array.isArray(data) ? data : []))
+      .catch(() => {});
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
     toast.success("Item added to inventory");
-    onSubmit({
-      name: name.trim(),
-      description: description.trim() || undefined,
-      category,
-      parentId: defaultParentId,
-      location: location.trim() || undefined,
-      manufacturer: manufacturer.trim() || undefined,
-      modelNumber: modelNumber.trim() || undefined,
-      serialNumber: serialNumber.trim() || undefined,
-      partNumber: partNumber.trim() || undefined,
-      purchaseDate: purchaseDate || undefined,
-      purchaseCost: purchaseCost ? parseInt(purchaseCost, 10) * 100 : undefined,
-      condition: condition || undefined,
-      notes: notes.trim() || undefined,
-    });
+    onSubmit(
+      {
+        name: name.trim(),
+        description: description.trim() || undefined,
+        category,
+        parentId: defaultParentId,
+        location: location.trim() || undefined,
+        manufacturer: manufacturer.trim() || undefined,
+        modelNumber: modelNumber.trim() || undefined,
+        serialNumber: serialNumber.trim() || undefined,
+        partNumber: partNumber.trim() || undefined,
+        purchaseDate: purchaseDate || undefined,
+        purchaseCost: purchaseCost ? parseInt(purchaseCost, 10) * 100 : undefined,
+        condition: condition || undefined,
+        notes: notes.trim() || undefined,
+      },
+      selectedTaskIds
+    );
   };
 
   return (
@@ -293,6 +307,77 @@ export function AddItemModal({
                 className="w-full px-3 py-2.5 rounded-xl border border-stone-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-sage-200 focus:border-sage-300 resize-none"
               />
             </div>
+
+            {/* Link Tasks */}
+            {allTasks.length > 0 && (
+              <div>
+                <label className="block text-xs font-medium text-stone-500 mb-1">
+                  Link Tasks
+                </label>
+                {selectedTaskIds.length > 0 && (
+                  <div className="space-y-1.5 mb-2">
+                    {selectedTaskIds.map((id) => {
+                      const task = allTasks.find((t) => t.id === id);
+                      if (!task) return null;
+                      return (
+                        <div
+                          key={id}
+                          className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-white border border-stone-200"
+                        >
+                          <span className="text-sm">
+                            {categoryIcons[task.category]}
+                          </span>
+                          <span className="text-xs font-medium text-stone-700 truncate flex-1">
+                            {task.title}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setSelectedTaskIds((prev) =>
+                                prev.filter((i) => i !== id)
+                              )
+                            }
+                            className="p-0.5 rounded hover:bg-rose-50 text-stone-300 hover:text-rose-500"
+                            aria-label={`Remove ${task.title}`}
+                          >
+                            <svg
+                              width="14"
+                              height="14"
+                              viewBox="0 0 14 14"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                            >
+                              <path d="M3 3l8 8M11 3l-8 8" />
+                            </svg>
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+                <select
+                  value=""
+                  onChange={(e) => {
+                    const id = parseInt(e.target.value, 10);
+                    if (id && !selectedTaskIds.includes(id)) {
+                      setSelectedTaskIds((prev) => [...prev, id]);
+                    }
+                  }}
+                  className="w-full px-3 py-2 rounded-xl border border-stone-200 bg-white text-xs text-stone-500 focus:outline-none focus:ring-2 focus:ring-sage-200 focus:border-sage-300"
+                >
+                  <option value="">+ Link a task...</option>
+                  {allTasks
+                    .filter((task) => !selectedTaskIds.includes(task.id))
+                    .map((task) => (
+                      <option key={task.id} value={task.id}>
+                        {categoryIcons[task.category]} {task.title}
+                      </option>
+                    ))}
+                </select>
+              </div>
+            )}
 
             {/* Actions */}
             {!isPurchased && (

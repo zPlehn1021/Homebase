@@ -148,8 +148,19 @@ export default function TasksPage() {
       {/* Add Task Modal */}
       {showAddModal && (
         <AddTaskModal
-          onSubmit={async (input) => {
-            await createTask(input);
+          onSubmit={async (input, linkedItemIds) => {
+            const task = await createTask(input);
+            if (task && linkedItemIds.length > 0) {
+              await Promise.all(
+                linkedItemIds.map((itemId) =>
+                  fetch(`/api/inventory/${itemId}/links`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ taskId: task.id }),
+                  })
+                )
+              );
+            }
             setShowAddModal(false);
             fetchTasks();
           }}

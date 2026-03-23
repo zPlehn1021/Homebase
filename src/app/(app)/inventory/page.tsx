@@ -147,8 +147,19 @@ export default function InventoryPage() {
       {showAddModal && (
         <AddItemModal
           defaultParentId={addParentId}
-          onSubmit={async (input) => {
-            await createItem(input);
+          onSubmit={async (input, linkedTaskIds) => {
+            const item = await createItem(input);
+            if (item && linkedTaskIds.length > 0) {
+              await Promise.all(
+                linkedTaskIds.map((taskId) =>
+                  fetch(`/api/inventory/${item.id}/links`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ taskId }),
+                  })
+                )
+              );
+            }
             setShowAddModal(false);
             fetchItems();
           }}
