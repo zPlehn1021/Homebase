@@ -52,7 +52,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     Resend({
       from: "Homebase <noreply@plehnlabs.com>",
     }),
-    Google,
+    Google({
+      checks: ["none"],
+    }),
   ],
   pages: {
     signIn: "/login",
