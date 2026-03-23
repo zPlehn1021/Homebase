@@ -30,7 +30,7 @@ export function EditTaskModal({
   );
 
   useEffect(() => {
-    fetch("/api/inventory")
+    fetch("/api/inventory?includeChildren=true")
       .then((r) => r.json())
       .then((data) => setAllItems(Array.isArray(data) ? data : []))
       .catch(() => {});

@@ -31,7 +31,7 @@ export function AddTaskModal({
   const [selectedItemIds, setSelectedItemIds] = useState<number[]>([]);
 
   useEffect(() => {
-    fetch("/api/inventory")
+    fetch("/api/inventory?includeChildren=true")
       .then((r) => r.json())
       .then((data) => setAllItems(Array.isArray(data) ? data : []))
       .catch(() => {});

@@ -1,18 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import type {
   InventoryItem,
   UpdateInventoryItemInput,
   InventoryCategory,
   ItemCondition,
+  Task,
 } from "@/lib/types";
 import {
   allInventoryCategories,
   inventoryCategoryIcons,
   allConditions,
   conditionLabels,
+  categoryIcons,
 } from "@/lib/utils";
 import { FocusTrap } from "@/components/ui/focus-trap";
 
@@ -41,6 +43,46 @@ export function EditItemModal({
     item.condition || ""
   );
   const [notes, setNotes] = useState(item.notes || "");
+  const [allTasks, setAllTasks] = useState<Task[]>([]);
+  const [linkedTasks, setLinkedTasks] = useState<Task[]>(
+    item.linkedTasks || []
+  );
+
+  useEffect(() => {
+    fetch("/api/tasks")
+      .then((r) => r.json())
+      .then((data) => setAllTasks(Array.isArray(data) ? data : []))
+      .catch(() => {});
+  }, []);
+
+  const linkTask = async (taskId: number) => {
+    const task = allTasks.find((t) => t.id === taskId);
+    if (!task || linkedTasks.some((t) => t.id === taskId)) return;
+    try {
+      const res = await fetch(`/api/inventory/${item.id}/links`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ taskId }),
+      });
+      if (!res.ok) throw new Error();
+      setLinkedTasks((prev) => [...prev, task]);
+    } catch {
+      toast.error("Failed to link task");
+    }
+  };
+
+  const unlinkTask = async (taskId: number) => {
+    try {
+      const res = await fetch(
+        `/api/inventory/${item.id}/links?taskId=${taskId}`,
+        { method: "DELETE" }
+      );
+      if (!res.ok) throw new Error();
+      setLinkedTasks((prev) => prev.filter((t) => t.id !== taskId));
+    } catch {
+      toast.error("Failed to unlink task");
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -286,6 +328,67 @@ export function EditItemModal({
                 rows={2}
                 className="w-full px-3 py-2.5 rounded-xl border border-stone-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-sage-200 focus:border-sage-300 resize-none"
               />
+            </div>
+
+            {/* Linked Tasks */}
+            <div>
+              <label className="block text-xs font-medium text-stone-500 mb-1">
+                Linked Tasks
+              </label>
+              {linkedTasks.length > 0 && (
+                <div className="space-y-1.5 mb-2">
+                  {linkedTasks.map((task) => (
+                    <div
+                      key={task.id}
+                      className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-white border border-stone-200"
+                    >
+                      <span className="text-sm">
+                        {categoryIcons[task.category]}
+                      </span>
+                      <span className="text-xs font-medium text-stone-700 truncate flex-1">
+                        {task.title}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => unlinkTask(task.id)}
+                        className="p-0.5 rounded hover:bg-rose-50 text-stone-300 hover:text-rose-500"
+                        aria-label={`Unlink ${task.title}`}
+                      >
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 14 14"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                        >
+                          <path d="M3 3l8 8M11 3l-8 8" />
+                        </svg>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {allTasks.length > 0 && (
+                <select
+                  value=""
+                  onChange={(e) => {
+                    const id = parseInt(e.target.value, 10);
+                    if (id) linkTask(id);
+                  }}
+                  className="w-full px-3 py-2 rounded-xl border border-stone-200 bg-white text-xs text-stone-500 focus:outline-none focus:ring-2 focus:ring-sage-200 focus:border-sage-300"
+                >
+                  <option value="">+ Link a task...</option>
+                  {allTasks
+                    .filter((t) => !linkedTasks.some((l) => l.id === t.id))
+                    .map((task) => (
+                      <option key={task.id} value={task.id}>
+                        {categoryIcons[task.category]} {task.title}
+                      </option>
+                    ))}
+                </select>
+              )}
             </div>
 
             <div className="flex gap-2 pt-2">
