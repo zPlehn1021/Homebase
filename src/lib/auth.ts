@@ -54,6 +54,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
     Google({
       checks: ["none"],
+      allowDangerousEmailAccountLinking: true,
     }),
   ],
   pages: {
