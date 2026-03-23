@@ -1,4 +1,7 @@
+"use client";
+
 import { MockTask, categoryIcons } from "@/lib/mock-data";
+import { inventoryCategoryIcons } from "@/lib/utils";
 
 function formatDate(dateStr: string) {
   const d = new Date(dateStr + "T00:00:00");
@@ -48,6 +51,18 @@ export function ComingUp({ tasks }: { tasks: MockTask[] }) {
                     {task.category}
                     {task.estimatedCost ? ` · Est. $${task.estimatedCost}` : ""}
                   </p>
+                  {task.linkedItems && task.linkedItems.length > 0 && (
+                    <div className="flex items-center gap-1 mt-0.5 text-[10px] text-stone-400">
+                      <span>{inventoryCategoryIcons[task.linkedItems[0].category]}</span>
+                      <span className="truncate">
+                        {task.linkedItems[0].parentName ? `${task.linkedItems[0].parentName} → ` : ""}
+                        {task.linkedItems[0].name}
+                      </span>
+                      {task.linkedItems.length > 1 && (
+                        <span className="shrink-0">+{task.linkedItems.length - 1}</span>
+                      )}
+                    </div>
+                  )}
                 </div>
                 <div className="text-right shrink-0">
                   <p className="text-sm font-medium text-stone-600">

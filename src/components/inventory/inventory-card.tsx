@@ -78,6 +78,11 @@ export function InventoryCard({
                 {item.childCount} sub-item{item.childCount !== 1 ? "s" : ""}
               </span>
             )}
+            {(item.linkedTaskCount ?? 0) > 0 && (
+              <span className="text-[11px] text-amber-600 font-medium">
+                {item.linkedTaskCount} task{item.linkedTaskCount !== 1 ? "s" : ""}
+              </span>
+            )}
           </div>
         </div>
 

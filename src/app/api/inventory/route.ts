@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
-import { eq, like, and, or, isNull, asc } from "drizzle-orm";
-import { inventoryItems, users } from "@/db/schema";
+import { eq, like, and, or, isNull, asc, inArray } from "drizzle-orm";
+import { inventoryItems, users, taskInventoryLinks } from "@/db/schema";
 import { getAuthenticatedUser } from "@/lib/auth-helpers";
 import type { InventoryCategory } from "@/lib/types";
 
@@ -72,9 +72,26 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // Get linked task counts
+    const resultIds = results.map((r) => r.id);
+    const linkedTaskCounts = new Map<number, number>();
+    if (resultIds.length > 0) {
+      const links = await db
+        .select()
+        .from(taskInventoryLinks)
+        .where(inArray(taskInventoryLinks.inventoryItemId, resultIds));
+      for (const link of links) {
+        linkedTaskCounts.set(
+          link.inventoryItemId,
+          (linkedTaskCounts.get(link.inventoryItemId) || 0) + 1
+        );
+      }
+    }
+
     const itemsWithCounts = results.map((item) => ({
       ...item,
       childCount: childCounts.get(item.id) || 0,
+      linkedTaskCount: linkedTaskCounts.get(item.id) || 0,
     }));
 
     return Response.json(itemsWithCounts);

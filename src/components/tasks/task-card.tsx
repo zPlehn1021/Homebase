@@ -82,6 +82,32 @@ export function TaskCard({
               {task.frequency}
             </span>
           </div>
+          {task.linkedItems && task.linkedItems.length > 0 && (
+            <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+              {task.linkedItems.slice(0, 2).map((item) => (
+                <span
+                  key={item.id}
+                  className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-stone-50 border border-stone-100 text-[10px] text-stone-500 max-w-[200px]"
+                >
+                  <span className="shrink-0">{inventoryCategoryIcons[item.category]}</span>
+                  <span className="truncate">
+                    {item.parentName ? `${item.parentName} → ` : ""}{item.name}
+                  </span>
+                  {item.partNumber && (
+                    <span className="text-stone-400 font-mono shrink-0">{item.partNumber}</span>
+                  )}
+                  {item.purchaseCost != null && (
+                    <span className="text-stone-400 shrink-0">{formatCurrency(item.purchaseCost)}</span>
+                  )}
+                </span>
+              ))}
+              {task.linkedItems.length > 2 && (
+                <span className="text-[10px] text-stone-400">
+                  +{task.linkedItems.length - 2} more
+                </span>
+              )}
+            </div>
+          )}
         </div>
         <div className="text-right shrink-0">
           {task.dueDate && (
@@ -177,7 +203,7 @@ export function TaskCard({
                   >
                     <span className="text-sm">{inventoryCategoryIcons[item.category]}</span>
                     <span className="text-xs font-medium text-stone-700 truncate flex-1">
-                      {item.name}
+                      {item.parentName ? `${item.parentName} → ` : ""}{item.name}
                     </span>
                     {item.partNumber && (
                       <span className="text-[10px] text-stone-400 font-mono">

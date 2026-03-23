@@ -67,11 +67,29 @@ export async function GET(request: NextRequest) {
           .from(inventoryItems)
           .where(inArray(inventoryItems.id, itemIds));
 
+        // Resolve parent names for sub-items
+        const parentIds = [...new Set(
+          inventoryItemRows.filter((i) => i.parentId).map((i) => i.parentId!)
+        )];
+        const parentMap = new Map<number, string>();
+        if (parentIds.length > 0) {
+          const parents = await db
+            .select({ id: inventoryItems.id, name: inventoryItems.name })
+            .from(inventoryItems)
+            .where(inArray(inventoryItems.id, parentIds));
+          for (const p of parents) parentMap.set(p.id, p.name);
+        }
+
         const itemMap = new Map(inventoryItemRows.map((i) => [i.id, i]));
         for (const link of links) {
           const existing = linkedItemsMap.get(link.taskId) || [];
           const item = itemMap.get(link.inventoryItemId);
-          if (item) existing.push(item);
+          if (item) {
+            const withParent = item.parentId
+              ? { ...item, parentName: parentMap.get(item.parentId) }
+              : item;
+            existing.push(withParent);
+          }
           linkedItemsMap.set(link.taskId, existing);
         }
       }

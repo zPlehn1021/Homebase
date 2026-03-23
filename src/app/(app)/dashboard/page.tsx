@@ -45,6 +45,7 @@ export default function DashboardPage() {
     estimatedCost: t.estimatedCost,
     actualCost: t.actualCost,
     completedAt: t.completedAt,
+    linkedItems: t.linkedItems,
   }));
 
   // Compute tasks by month for YearAtAGlance

@@ -1,4 +1,7 @@
+"use client";
+
 import { MockTask, categoryIcons } from "@/lib/mock-data";
+import { inventoryCategoryIcons, formatCurrency } from "@/lib/utils";
 
 function daysUntil(dateStr: string) {
   const now = new Date();
@@ -80,6 +83,32 @@ export function ActionRequired({ tasks }: { tasks: MockTask[] }) {
                 <p className="mt-2 text-xs text-stone-400">
                   Est. ${task.estimatedCost}
                 </p>
+              )}
+              {task.linkedItems && task.linkedItems.length > 0 && (
+                <div className="mt-2 space-y-1">
+                  {task.linkedItems.slice(0, 1).map((item) => (
+                    <div
+                      key={item.id}
+                      className="flex items-center gap-1 text-[10px] text-stone-500"
+                    >
+                      <span>{inventoryCategoryIcons[item.category]}</span>
+                      <span className="truncate">
+                        {item.parentName ? `${item.parentName} → ` : ""}{item.name}
+                      </span>
+                      {item.partNumber && (
+                        <span className="text-stone-400 font-mono shrink-0">{item.partNumber}</span>
+                      )}
+                      {item.purchaseCost != null && (
+                        <span className="text-stone-400 shrink-0">{formatCurrency(item.purchaseCost)}</span>
+                      )}
+                    </div>
+                  ))}
+                  {task.linkedItems.length > 1 && (
+                    <p className="text-[10px] text-stone-400">
+                      +{task.linkedItems.length - 1} more item{task.linkedItems.length > 2 ? "s" : ""}
+                    </p>
+                  )}
+                </div>
               )}
             </div>
           );

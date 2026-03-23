@@ -22,6 +22,7 @@ export interface MockTask {
   estimatedCost: number | null;
   actualCost: number | null;
   completedAt: string | null;
+  linkedItems?: import("@/lib/types").InventoryItem[];
 }
 
 export const mockUser = {

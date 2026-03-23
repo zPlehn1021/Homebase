@@ -113,6 +113,8 @@ export interface InventoryItem {
   documents?: InventoryDocument[];
   linkedTasks?: Task[];
   childCount?: number;
+  linkedTaskCount?: number;
+  parentName?: string;
 }
 
 export interface InventoryDocument {
