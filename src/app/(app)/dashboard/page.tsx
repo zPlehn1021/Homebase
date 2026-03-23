@@ -8,6 +8,7 @@ import { SeasonalSummary } from "@/components/dashboard/seasonal-summary";
 import { YearAtAGlance } from "@/components/dashboard/year-at-a-glance";
 import { QuickStats } from "@/components/dashboard/quick-stats";
 import { StatsSkeleton, LoadingSkeleton } from "@/components/ui/loading-skeleton";
+import { useUser } from "@/lib/hooks/use-user";
 
 function getGreeting() {
   const hour = new Date().getHours();
@@ -29,6 +30,8 @@ function getSeasonalTip() {
 
 export default function DashboardPage() {
   const { tasks, loading } = useTasks();
+  const { user } = useUser();
+  const firstName = user?.name?.split(" ")[0] || "there";
 
   // Convert Task[] to MockTask-compatible shape for dashboard components
   const dashTasks = tasks.map((t) => ({
@@ -92,7 +95,7 @@ export default function DashboardPage() {
       {/* Welcome header */}
       <div className="space-y-1">
         <h1 className="text-2xl sm:text-3xl font-bold text-stone-900 tracking-tight">
-          {getGreeting()}, Jordan
+          {getGreeting()}, {firstName}
         </h1>
         <p className="text-sm text-stone-500 max-w-xl">{getSeasonalTip()}</p>
       </div>
