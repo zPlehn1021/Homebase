@@ -1,24 +1,23 @@
 import { getDb } from "@/db";
-import { users, tasks, sessions, featureRequests, announcements, bugReports } from "@/db/schema";
-import { count, eq } from "drizzle-orm";
+import { users, sessions, featureRequests, announcements, bugReports } from "@/db/schema";
+import { count, eq, gte } from "drizzle-orm";
 
 export default async function AdminPage() {
   const db = getDb();
+  const now = new Date();
 
-  const [userCount, taskCount, sessionCount, pendingCount, announcementCount, openBugCount] = db
+  const [userCount, sessionCount, pendingCount, announcementCount, openBugCount] = db
     ? await Promise.all([
         db.select({ count: count() }).from(users),
-        db.select({ count: count() }).from(tasks),
-        db.select({ count: count() }).from(sessions),
+        db.select({ count: count() }).from(sessions).where(gte(sessions.expires, now)),
         db.select({ count: count() }).from(featureRequests).where(eq(featureRequests.status, "pending")),
         db.select({ count: count() }).from(announcements).where(eq(announcements.active, true)),
         db.select({ count: count() }).from(bugReports).where(eq(bugReports.status, "open")),
       ])
-    : [[{ count: 0 }], [{ count: 0 }], [{ count: 0 }], [{ count: 0 }], [{ count: 0 }], [{ count: 0 }]];
+    : [[{ count: 0 }], [{ count: 0 }], [{ count: 0 }], [{ count: 0 }], [{ count: 0 }]];
 
   const stats = [
     { label: "Users", value: userCount[0].count },
-    { label: "Tasks", value: taskCount[0].count },
     { label: "Active Sessions", value: sessionCount[0].count },
     { label: "Pending Requests", value: pendingCount[0].count, href: "/admin/feature-requests" },
     { label: "Active Announcements", value: announcementCount[0].count, href: "/admin/announcements" },

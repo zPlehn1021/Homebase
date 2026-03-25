@@ -47,7 +47,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         verificationTokensTable: verificationTokens as any,
       })
     : undefined,
-  session: { strategy: "database" },
+  session: {
+    strategy: "database",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+    updateAge: 24 * 60 * 60,   // Extend session every 24h of activity
+  },
   providers: [
     Resend({
       from: "Homebase <noreply@plehnlabs.com>",
