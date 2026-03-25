@@ -140,8 +140,41 @@ export function useTasks(initialParams?: UseTasksParams) {
   const completeTask = async (
     id: number,
     actualCost?: number
-  ): Promise<Task | null> => {
-    return updateTask(id, { markComplete: true, actualCost });
+  ): Promise<(Task & { recurring?: boolean }) | null> => {
+    try {
+      const res = await fetch(`/api/tasks/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ markComplete: true, actualCost }),
+      });
+      if (!res.ok) throw new Error("Failed to complete task");
+      const data = await res.json();
+      const { recurring, ...updated } = data;
+      updated.status = computeTaskStatus(updated.dueDate, updated.completedAt);
+      setTasks((prev) => prev.map((t) => (t.id === id ? updated : t)));
+      return { ...updated, recurring };
+    } catch {
+      setError("Failed to complete task");
+      return null;
+    }
+  };
+
+  const reopenTask = async (id: number): Promise<Task | null> => {
+    try {
+      const res = await fetch(`/api/tasks/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reopen: true }),
+      });
+      if (!res.ok) throw new Error("Failed to reopen task");
+      const updated = await res.json();
+      updated.status = computeTaskStatus(updated.dueDate, updated.completedAt);
+      setTasks((prev) => prev.map((t) => (t.id === id ? updated : t)));
+      return updated;
+    } catch {
+      setError("Failed to reopen task");
+      return null;
+    }
   };
 
   const snoozeTask = async (
@@ -173,6 +206,7 @@ export function useTasks(initialParams?: UseTasksParams) {
     updateTask,
     completeTask,
     snoozeTask,
+    reopenTask,
     deleteTask,
   };
 }

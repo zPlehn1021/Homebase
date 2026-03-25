@@ -29,6 +29,7 @@ export function TaskCard({
   onToggle,
   onComplete,
   onSnooze,
+  onReopen,
   onDelete,
   onEdit,
 }: {
@@ -37,6 +38,7 @@ export function TaskCard({
   onToggle: () => void;
   onComplete: (actualCost?: number) => void;
   onSnooze: (duration: SnoozeDuration) => void;
+  onReopen?: () => void;
   onDelete?: () => void;
   onEdit?: () => void;
 }) {
@@ -222,163 +224,179 @@ export function TaskCard({
           )}
 
           {/* Actions */}
-          {!isCompleted && (
-            <div className="flex flex-wrap gap-2 pt-1">
-              {/* Purchase upgrade hint */}
-              {showUpgradeHint && (
-                <div className="w-full bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 flex items-center justify-between">
-                  <p className="text-xs text-amber-800">
-                    Purchase Homebase to mark tasks complete.
-                  </p>
-                  <Link
-                    href="/pricing"
-                    className="text-xs font-semibold text-amber-700 hover:text-amber-900 underline"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    Upgrade
-                  </Link>
-                </div>
-              )}
-
-              {/* Mark Complete */}
-              {!showComplete ? (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (!isPurchased) {
-                      setShowUpgradeHint(true);
-                      return;
-                    }
-                    setShowComplete(true);
-                  }}
-                  className="px-3 py-1.5 rounded-xl bg-sage-600 text-white text-xs font-medium hover:bg-sage-700 transition-colors"
-                >
-                  Mark Complete
-                </button>
-              ) : (
-                <div className="flex items-center gap-2 bg-green-50 rounded-xl px-3 py-2 border border-green-200">
-                  <label className="text-xs text-stone-600">Actual cost:</label>
-                  <span className="text-xs text-stone-400">$</span>
-                  <input
-                    type="number"
-                    min="0"
-                    step="1"
-                    value={actualCost}
-                    onChange={(e) => setActualCost(e.target.value)}
-                    className="w-20 px-2 py-1 text-xs rounded-lg border border-stone-200 bg-white"
-                    onClick={(e) => e.stopPropagation()}
-                  />
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onComplete(
-                        actualCost ? parseInt(actualCost, 10) : undefined
-                      );
-                      toast.success("Task completed!");
-                    }}
-                    className="px-2 py-1 rounded-lg bg-green-600 text-white text-xs font-medium hover:bg-green-700"
-                  >
-                    Confirm
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowComplete(false);
-                    }}
-                    className="text-xs text-stone-400 hover:text-stone-600"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              )}
-
-              {/* Edit */}
-              {onEdit && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onEdit();
-                  }}
-                  className="px-3 py-1.5 rounded-xl border border-stone-200 text-stone-500 text-xs font-medium hover:bg-stone-50 transition-colors"
-                >
-                  Edit
-                </button>
-              )}
-              {/* Snooze */}
-              <div className="relative">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowSnooze(!showSnooze);
-                  }}
-                  className="px-3 py-1.5 rounded-xl border border-stone-200 text-stone-500 text-xs font-medium hover:bg-stone-50 transition-colors"
-                >
-                  Snooze
-                </button>
-                {showSnooze && (
-                  <div className="absolute top-full left-0 mt-1 bg-white rounded-xl border border-stone-200 shadow-lg py-1 z-10 min-w-[120px]">
-                    {(
-                      [
-                        { value: "1w", label: "1 week" },
-                        { value: "2w", label: "2 weeks" },
-                        { value: "1mo", label: "1 month" },
-                      ] as { value: SnoozeDuration; label: string }[]
-                    ).map((opt) => (
-                      <button
-                        key={opt.value}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onSnooze(opt.value);
-                          setShowSnooze(false);
-                          toast.success(`Task snoozed for ${opt.label}`);
-                        }}
-                        className="w-full text-left px-3 py-1.5 text-xs text-stone-600 hover:bg-stone-50"
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
+          <div className="flex flex-wrap gap-2 pt-1">
+            {!isCompleted && (
+              <>
+                {/* Purchase upgrade hint */}
+                {showUpgradeHint && (
+                  <div className="w-full bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 flex items-center justify-between">
+                    <p className="text-xs text-amber-800">
+                      Purchase Homebase to mark tasks complete.
+                    </p>
+                    <Link
+                      href="/pricing"
+                      className="text-xs font-semibold text-amber-700 hover:text-amber-900 underline"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      Upgrade
+                    </Link>
                   </div>
                 )}
-              </div>
 
-              {/* Delete */}
-              {onDelete && !showDeleteConfirm && (
+                {/* Mark Complete */}
+                {!showComplete ? (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (!isPurchased) {
+                        setShowUpgradeHint(true);
+                        return;
+                      }
+                      setShowComplete(true);
+                    }}
+                    className="px-3 py-1.5 rounded-xl bg-sage-600 text-white text-xs font-medium hover:bg-sage-700 transition-colors"
+                  >
+                    Mark Complete
+                  </button>
+                ) : (
+                  <div className="flex items-center gap-2 bg-green-50 rounded-xl px-3 py-2 border border-green-200">
+                    <label className="text-xs text-stone-600">Actual cost:</label>
+                    <span className="text-xs text-stone-400">$</span>
+                    <input
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={actualCost}
+                      onChange={(e) => setActualCost(e.target.value)}
+                      className="w-20 px-2 py-1 text-xs rounded-lg border border-stone-200 bg-white"
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onComplete(
+                          actualCost ? parseInt(actualCost, 10) : undefined
+                        );
+                      }}
+                      className="px-2 py-1 rounded-lg bg-green-600 text-white text-xs font-medium hover:bg-green-700"
+                    >
+                      Confirm
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowComplete(false);
+                      }}
+                      className="text-xs text-stone-400 hover:text-stone-600"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                )}
+
+                {/* Snooze */}
+                <div className="relative">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowSnooze(!showSnooze);
+                    }}
+                    className="px-3 py-1.5 rounded-xl border border-stone-200 text-stone-500 text-xs font-medium hover:bg-stone-50 transition-colors"
+                  >
+                    Snooze
+                  </button>
+                  {showSnooze && (
+                    <div className="absolute top-full left-0 mt-1 bg-white rounded-xl border border-stone-200 shadow-lg py-1 z-10 min-w-[120px]">
+                      {(
+                        [
+                          { value: "1w", label: "1 week" },
+                          { value: "2w", label: "2 weeks" },
+                          { value: "1mo", label: "1 month" },
+                        ] as { value: SnoozeDuration; label: string }[]
+                      ).map((opt) => (
+                        <button
+                          key={opt.value}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onSnooze(opt.value);
+                            setShowSnooze(false);
+                            toast.success(`Task snoozed for ${opt.label}`);
+                          }}
+                          className="w-full text-left px-3 py-1.5 text-xs text-stone-600 hover:bg-stone-50"
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+
+            {/* Reopen (completed tasks only) */}
+            {isCompleted && onReopen && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onReopen();
+                  toast.success("Task reopened");
+                }}
+                className="px-3 py-1.5 rounded-xl bg-sage-600 text-white text-xs font-medium hover:bg-sage-700 transition-colors"
+              >
+                Reopen
+              </button>
+            )}
+
+            {/* Edit */}
+            {onEdit && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit();
+                }}
+                className="px-3 py-1.5 rounded-xl border border-stone-200 text-stone-500 text-xs font-medium hover:bg-stone-50 transition-colors"
+              >
+                Edit
+              </button>
+            )}
+
+            {/* Delete */}
+            {onDelete && !showDeleteConfirm && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowDeleteConfirm(true);
+                }}
+                className="px-3 py-1.5 rounded-xl border border-rose-200 text-rose-500 text-xs font-medium hover:bg-rose-50 transition-colors ml-auto"
+              >
+                Delete
+              </button>
+            )}
+            {onDelete && showDeleteConfirm && (
+              <div className="flex items-center gap-2 ml-auto bg-rose-50 rounded-xl px-3 py-1.5 border border-rose-200">
+                <span className="text-xs text-rose-600">Delete this task?</span>
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    setShowDeleteConfirm(true);
+                    onDelete();
+                    toast.success("Task deleted");
                   }}
-                  className="px-3 py-1.5 rounded-xl border border-rose-200 text-rose-500 text-xs font-medium hover:bg-rose-50 transition-colors ml-auto"
+                  className="px-2 py-1 rounded-lg bg-rose-600 text-white text-xs font-medium hover:bg-rose-700"
                 >
-                  Delete
+                  Yes
                 </button>
-              )}
-              {onDelete && showDeleteConfirm && (
-                <div className="flex items-center gap-2 ml-auto bg-rose-50 rounded-xl px-3 py-1.5 border border-rose-200">
-                  <span className="text-xs text-rose-600">Delete this task?</span>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onDelete();
-                      toast.success("Task deleted");
-                    }}
-                    className="px-2 py-1 rounded-lg bg-rose-600 text-white text-xs font-medium hover:bg-rose-700"
-                  >
-                    Yes
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowDeleteConfirm(false);
-                    }}
-                    className="text-xs text-stone-400 hover:text-stone-600"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowDeleteConfirm(false);
+                  }}
+                  className="text-xs text-stone-400 hover:text-stone-600"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

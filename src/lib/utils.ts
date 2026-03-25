@@ -1,4 +1,4 @@
-import type { TaskStatus, TaskCategory, SnoozeDuration, InventoryCategory, ItemCondition } from "./types";
+import type { TaskStatus, TaskCategory, TaskFrequency, SnoozeDuration, InventoryCategory, ItemCondition } from "./types";
 
 export function computeTaskStatus(
   dueDate: string | null,
@@ -70,6 +70,29 @@ export function snoozeDueDate(
 }
 
 export function toISODate(d: Date): string {
+  return d.toISOString().split("T")[0];
+}
+
+export function advanceDueDate(
+  currentDue: string,
+  frequency: TaskFrequency
+): string | null {
+  if (frequency === "one-time") return null;
+  const d = new Date(currentDue + "T00:00:00");
+  switch (frequency) {
+    case "monthly":
+      d.setMonth(d.getMonth() + 1);
+      break;
+    case "quarterly":
+      d.setMonth(d.getMonth() + 3);
+      break;
+    case "semi-annually":
+      d.setMonth(d.getMonth() + 6);
+      break;
+    case "annually":
+      d.setFullYear(d.getFullYear() + 1);
+      break;
+  }
   return d.toISOString().split("T")[0];
 }
 

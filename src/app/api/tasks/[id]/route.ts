@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { eq, and } from "drizzle-orm";
 import { tasks, users } from "@/db/schema";
 import { getAuthenticatedUser } from "@/lib/auth-helpers";
-import { snoozeDueDate } from "@/lib/utils";
+import { snoozeDueDate, advanceDueDate } from "@/lib/utils";
 import { parseId, validateCost } from "@/lib/validation";
 
 export const dynamic = "force-dynamic";
@@ -38,13 +38,14 @@ export async function PATCH(
 
     const updates: Record<string, unknown> = {};
 
+    let recurring = false;
+
     // Mark complete — requires purchase verification
     if (body.markComplete) {
       const userResult = await db.select({ purchaseVerified: users.purchaseVerified }).from(users).where(eq(users.id, userId)).limit(1);
       if (userResult[0] && !userResult[0].purchaseVerified) {
         return Response.json({ error: "Purchase required to mark tasks complete" }, { status: 403 });
       }
-      updates.completedAt = new Date().toISOString();
       if (body.actualCost !== undefined) {
         const cost = validateCost(body.actualCost);
         if (cost === null) {
@@ -52,6 +53,27 @@ export async function PATCH(
         }
         updates.actualCost = cost;
       }
+
+      const task = current[0];
+      const nextDate = task.dueDate && task.frequency !== "one-time"
+        ? advanceDueDate(task.dueDate, task.frequency as "monthly" | "quarterly" | "semi-annually" | "annually")
+        : null;
+
+      if (nextDate) {
+        // Recurring: advance due date, clear completion
+        updates.dueDate = nextDate;
+        updates.completedAt = null;
+        updates.actualCost = null;
+        recurring = true;
+      } else {
+        // One-time: stays completed
+        updates.completedAt = new Date().toISOString();
+      }
+    }
+
+    // Reopen a completed task
+    if (body.reopen) {
+      updates.completedAt = null;
     }
 
     // Snooze
@@ -85,7 +107,7 @@ export async function PATCH(
       .where(eq(tasks.id, taskId))
       .returning();
 
-    return Response.json(result[0]);
+    return Response.json({ ...result[0], recurring });
   } catch (error) {
     console.error("PATCH /api/tasks/[id] error:", error);
     return Response.json({ error: "Internal server error" }, { status: 500 });

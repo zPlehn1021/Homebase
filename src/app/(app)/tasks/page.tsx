@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import { useTasks } from "@/lib/hooks/use-tasks";
 import type { Task, TaskStatus, TaskCategory } from "@/lib/types";
-import { computeTaskStatus } from "@/lib/utils";
+import { computeTaskStatus, formatDate } from "@/lib/utils";
 import { TaskTabs } from "@/components/tasks/task-tabs";
 import { CategoryFilter } from "@/components/tasks/category-filter";
 import { SearchBar } from "@/components/tasks/search-bar";
@@ -15,7 +15,7 @@ import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
 
 export default function TasksPage() {
-  const { tasks, loading, createTask, updateTask, completeTask, snoozeTask, deleteTask, fetchTasks } =
+  const { tasks, loading, createTask, updateTask, completeTask, snoozeTask, reopenTask, deleteTask, fetchTasks } =
     useTasks();
   const [activeTab, setActiveTab] = useState<TaskStatus | "all">("all");
   const [categoryFilter, setCategoryFilter] = useState<TaskCategory | null>(
@@ -137,8 +137,21 @@ export default function TasksPage() {
               onToggle={() =>
                 setExpandedId(expandedId === task.id ? null : task.id)
               }
-              onComplete={(cost) => completeTask(task.id, cost)}
+              onComplete={async (cost) => {
+                const result = await completeTask(task.id, cost);
+                if (result?.recurring) {
+                  toast.success(`Task completed! Rescheduled to ${formatDate(result.dueDate!)}`);
+                } else if (result) {
+                  toast.success("Task completed!");
+                } else {
+                  toast.error("Failed to complete task");
+                }
+              }}
               onSnooze={(dur) => snoozeTask(task.id, dur)}
+              onReopen={async () => {
+                const result = await reopenTask(task.id);
+                if (!result) toast.error("Failed to reopen task");
+              }}
               onDelete={() => deleteTask(task.id)}
               onEdit={() => setEditingTask(task)}
             />
