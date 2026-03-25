@@ -13,7 +13,22 @@ export async function GET() {
   try {
     const { db, userId } = authResult;
     const result = await db
-      .select()
+      .select({
+        id: users.id,
+        email: users.email,
+        name: users.name,
+        propertyType: users.propertyType,
+        homeAgeYears: users.homeAgeYears,
+        squareFootage: users.squareFootage,
+        homeFeatures: users.homeFeatures,
+        onboardingCompleted: users.onboardingCompleted,
+        emailReminders: users.emailReminders,
+        reminderFrequency: users.reminderFrequency,
+        weeklyDigest: users.weeklyDigest,
+        purchaseVerified: users.purchaseVerified,
+        image: users.image,
+        createdAt: users.createdAt,
+      })
       .from(users)
       .where(eq(users.id, userId))
       .limit(1);

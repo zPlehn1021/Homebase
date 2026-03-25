@@ -87,7 +87,6 @@ export function EditTaskModal({
       return;
     }
 
-    toast.success("Task updated");
     onSubmit(task.id, updates);
   };
 
@@ -222,6 +221,8 @@ export function EditTaskModal({
                   </span>
                   <input
                     type="number"
+                    min="0"
+                    step="1"
                     value={estimatedCost}
                     onChange={(e) => setEstimatedCost(e.target.value)}
                     placeholder="0"

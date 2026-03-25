@@ -169,6 +169,51 @@ export interface UpdateInventoryItemInput {
   customFields?: { label: string; value: string }[];
 }
 
+// ── Feature Request types ────────────────────────────────────────
+
+export type FeatureRequestStatus =
+  | "pending"
+  | "voting"
+  | "community_approved"
+  | "completed";
+
+export interface FeatureRequest {
+  id: number;
+  userId: number;
+  title: string;
+  description: string;
+  status: FeatureRequestStatus;
+  createdAt: string;
+  resolvedAt: string | null;
+  voteCount?: number;
+  hasVoted?: boolean;
+  submitterName?: string;
+  totalActiveUsers?: number;
+}
+
+export interface Announcement {
+  id: number;
+  title: string;
+  body: string;
+  createdAt: string;
+  active: boolean;
+}
+
+// ── Bug Report types ────────────────────────────────────────────
+
+export type BugReportStatus = "open" | "fixed";
+
+export interface BugReport {
+  id: number;
+  userId: number;
+  title: string;
+  description: string;
+  status: BugReportStatus;
+  createdAt: string;
+  resolvedAt: string | null;
+  submitterName?: string;
+}
+
 // ── Task types ──────────────────────────────────────────────────
 
 export interface TaskStats {

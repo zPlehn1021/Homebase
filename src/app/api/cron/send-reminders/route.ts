@@ -141,10 +141,6 @@ async function handleReminders(request: Request) {
   }
 }
 
-export async function GET(request: Request) {
-  return handleReminders(request);
-}
-
 export async function POST(request: Request) {
   return handleReminders(request);
 }

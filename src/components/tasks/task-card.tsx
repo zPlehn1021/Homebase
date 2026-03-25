@@ -261,6 +261,8 @@ export function TaskCard({
                   <span className="text-xs text-stone-400">$</span>
                   <input
                     type="number"
+                    min="0"
+                    step="1"
                     value={actualCost}
                     onChange={(e) => setActualCost(e.target.value)}
                     className="w-20 px-2 py-1 text-xs rounded-lg border border-stone-200 bg-white"

@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer, primaryKey } from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, integer, primaryKey, unique } from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
 
 export const users = sqliteTable("users", {
@@ -29,6 +29,7 @@ export const users = sqliteTable("users", {
   weeklyDigest: integer("weekly_digest", { mode: "boolean" })
     .notNull()
     .default(false),
+  isAdmin: integer("is_admin", { mode: "boolean" }).notNull().default(false),
   emailVerified: integer("emailVerified", { mode: "timestamp_ms" }),
   image: text("image"),
 });
@@ -200,6 +201,88 @@ export const taskInventoryLinks = sqliteTable(
   },
   (table) => [primaryKey({ columns: [table.taskId, table.inventoryItemId] })]
 );
+
+// ── Feature Requests & Announcements ────────────────────────────
+
+export const featureRequests = sqliteTable("feature_requests", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  status: text("status", {
+    enum: ["pending", "voting", "community_approved", "completed"],
+  })
+    .notNull()
+    .default("pending"),
+  createdAt: text("created_at")
+    .notNull()
+    .default(sql`(datetime('now'))`),
+  resolvedAt: text("resolved_at"),
+});
+
+export const featureVotes = sqliteTable(
+  "feature_votes",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    featureRequestId: integer("feature_request_id")
+      .notNull()
+      .references(() => featureRequests.id, { onDelete: "cascade" }),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`(datetime('now'))`),
+  },
+  (table) => [unique().on(table.featureRequestId, table.userId)]
+);
+
+export const announcements = sqliteTable("announcements", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  title: text("title").notNull(),
+  body: text("body").notNull(),
+  createdAt: text("created_at")
+    .notNull()
+    .default(sql`(datetime('now'))`),
+  active: integer("active", { mode: "boolean" }).notNull().default(true),
+});
+
+export const announcementDismissals = sqliteTable(
+  "announcement_dismissals",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    announcementId: integer("announcement_id")
+      .notNull()
+      .references(() => announcements.id, { onDelete: "cascade" }),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    dismissedAt: text("dismissed_at")
+      .notNull()
+      .default(sql`(datetime('now'))`),
+  },
+  (table) => [unique().on(table.announcementId, table.userId)]
+);
+
+// ── Bug Reports ─────────────────────────────────────────────────
+
+export const bugReports = sqliteTable("bug_reports", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  status: text("status", { enum: ["open", "fixed"] })
+    .notNull()
+    .default("open"),
+  createdAt: text("created_at")
+    .notNull()
+    .default(sql`(datetime('now'))`),
+  resolvedAt: text("resolved_at"),
+});
 
 // ── Auth.js tables ──────────────────────────────────────────────
 

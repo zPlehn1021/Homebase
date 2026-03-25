@@ -91,7 +91,7 @@ export function useTasks(initialParams?: UseTasksParams) {
         setLoading(false);
       }
     },
-    [initialParams, usingMockData]
+    [initialParams]
   );
 
   useEffect(() => {

@@ -3,6 +3,7 @@ import { eq, and } from "drizzle-orm";
 import { tasks, users } from "@/db/schema";
 import { getAuthenticatedUser } from "@/lib/auth-helpers";
 import { snoozeDueDate } from "@/lib/utils";
+import { parseId, validateCost } from "@/lib/validation";
 
 export const dynamic = "force-dynamic";
 
@@ -18,7 +19,10 @@ export async function PATCH(
   try {
     const { db, userId } = authResult;
     const { id } = await params;
-    const taskId = parseInt(id, 10);
+    const taskId = parseId(id);
+    if (!taskId) {
+      return Response.json({ error: "Invalid ID" }, { status: 400 });
+    }
     const body = await request.json();
 
     // Fetch current task — scoped to authenticated user
@@ -42,7 +46,11 @@ export async function PATCH(
       }
       updates.completedAt = new Date().toISOString();
       if (body.actualCost !== undefined) {
-        updates.actualCost = body.actualCost;
+        const cost = validateCost(body.actualCost);
+        if (cost === null) {
+          return Response.json({ error: "Invalid actual cost" }, { status: 400 });
+        }
+        updates.actualCost = cost;
       }
     }
 
@@ -58,8 +66,13 @@ export async function PATCH(
     if (body.frequency !== undefined) updates.frequency = body.frequency;
     if (body.dueDate !== undefined && !body.snoozeDuration)
       updates.dueDate = body.dueDate;
-    if (body.estimatedCost !== undefined)
-      updates.estimatedCost = body.estimatedCost;
+    if (body.estimatedCost !== undefined) {
+      const cost = validateCost(body.estimatedCost);
+      if (cost === null) {
+        return Response.json({ error: "Invalid estimated cost" }, { status: 400 });
+      }
+      updates.estimatedCost = cost;
+    }
     if (body.notes !== undefined) updates.notes = body.notes;
 
     if (Object.keys(updates).length === 0) {
@@ -91,7 +104,10 @@ export async function DELETE(
   try {
     const { db, userId } = authResult;
     const { id } = await params;
-    const taskId = parseInt(id, 10);
+    const taskId = parseId(id);
+    if (!taskId) {
+      return Response.json({ error: "Invalid ID" }, { status: 400 });
+    }
 
     await db
       .delete(tasks)

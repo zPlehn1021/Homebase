@@ -1,9 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import type { HomebaseSession } from "@/lib/auth.d";
+import { SubmitBugModal } from "@/components/bug-reports/submit-bug-modal";
+import { useBugReports } from "@/lib/hooks/use-bug-reports";
 
 const navItems = [
   {
@@ -57,6 +60,16 @@ const navItems = [
     ),
   },
   {
+    label: "Feature Requests",
+    href: "/feature-requests",
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M10 3a4 4 0 014 4c0 1.5-.8 2.7-2 3.4V12a1 1 0 01-1 1H9a1 1 0 01-1-1v-1.6A4 4 0 0110 3z" />
+        <path d="M8 15h4M9 17h2" />
+      </svg>
+    ),
+  },
+  {
     label: "Settings",
     href: "/settings",
     icon: (
@@ -78,6 +91,8 @@ export function Sidebar({
   const pathname = usePathname();
   const { data: rawSession } = useSession();
   const session = rawSession as HomebaseSession | null;
+  const [bugModalOpen, setBugModalOpen] = useState(false);
+  const { submitReport } = useBugReports();
 
   const userName = session?.user?.name || "Homeowner";
   const userPropertyType = session?.user?.propertyType || "home";
@@ -138,6 +153,29 @@ export function Sidebar({
           );
         })}
       </nav>
+
+      {/* Bug Report */}
+      <div className="px-3 py-2">
+        <button
+          onClick={() => setBugModalOpen(true)}
+          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-stone-500 hover:bg-stone-100 hover:text-stone-700 transition-all duration-150"
+        >
+          <span className="text-stone-400">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="10" cy="10" r="7" />
+              <path d="M10 7v3M10 13h.01" />
+            </svg>
+          </span>
+          Report a Bug
+        </button>
+      </div>
+
+      {bugModalOpen && (
+        <SubmitBugModal
+          onSubmit={submitReport}
+          onClose={() => setBugModalOpen(false)}
+        />
+      )}
 
       {/* User section */}
       <div className="p-3 mt-auto space-y-2">

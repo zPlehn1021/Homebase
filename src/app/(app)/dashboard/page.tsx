@@ -7,8 +7,10 @@ import { ComingUp } from "@/components/dashboard/coming-up";
 import { SeasonalSummary } from "@/components/dashboard/seasonal-summary";
 import { YearAtAGlance } from "@/components/dashboard/year-at-a-glance";
 import { QuickStats } from "@/components/dashboard/quick-stats";
+import { AnnouncementsBanner } from "@/components/dashboard/announcements-banner";
 import { StatsSkeleton, LoadingSkeleton } from "@/components/ui/loading-skeleton";
 import { useUser } from "@/lib/hooks/use-user";
+import { useAnnouncements } from "@/lib/hooks/use-announcements";
 
 function getGreeting() {
   const hour = new Date().getHours();
@@ -31,6 +33,7 @@ function getSeasonalTip() {
 export default function DashboardPage() {
   const { tasks, loading } = useTasks();
   const { user } = useUser();
+  const { announcements, dismiss: dismissAnnouncement } = useAnnouncements();
   const firstName = user?.name?.split(" ")[0] || "there";
 
   // Convert Task[] to MockTask-compatible shape for dashboard components
@@ -108,6 +111,12 @@ export default function DashboardPage() {
         </>
       ) : (
         <>
+          {/* Announcements */}
+          <AnnouncementsBanner
+            announcements={announcements}
+            onDismiss={dismissAnnouncement}
+          />
+
           {/* Quick Stats */}
           <QuickStats tasks={dashTasks} />
 

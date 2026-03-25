@@ -31,20 +31,28 @@ export function ItemDetailPanel({
 }) {
   const [item, setItem] = useState<InventoryItem | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   const refreshItem = useCallback(() => {
     fetch(`/api/inventory/${itemId}`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error();
+        return res.json();
+      })
       .then((data) => setItem(data))
-      .catch(() => {});
+      .catch(() => setError(true));
   }, [itemId]);
 
   useEffect(() => {
     setLoading(true);
+    setError(false);
     fetch(`/api/inventory/${itemId}`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error();
+        return res.json();
+      })
       .then((data) => setItem(data))
-      .catch(() => {})
+      .catch(() => setError(true))
       .finally(() => setLoading(false));
   }, [itemId]);
 
@@ -63,7 +71,22 @@ export function ItemDetailPanel({
     );
   }
 
-  if (!item) return null;
+  if (error || !item) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" onClick={onClose} />
+        <div className="relative w-full max-w-2xl bg-cream rounded-2xl border border-stone-200 shadow-xl p-8 text-center">
+          <p className="text-sm text-stone-500">Failed to load item details.</p>
+          <button
+            onClick={onClose}
+            className="mt-4 px-4 py-2 rounded-xl border border-stone-200 text-stone-600 text-sm font-medium hover:bg-stone-50"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const detailFields = [
     { label: "Location", value: item.location },

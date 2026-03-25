@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { toast } from "sonner";
 import { useTasks } from "@/lib/hooks/use-tasks";
 import type { Task, TaskStatus, TaskCategory } from "@/lib/types";
 import { computeTaskStatus } from "@/lib/utils";
@@ -150,17 +151,30 @@ export default function TasksPage() {
         <AddTaskModal
           onSubmit={async (input, linkedItemIds) => {
             const task = await createTask(input);
-            if (task && linkedItemIds.length > 0) {
-              await Promise.all(
-                linkedItemIds.map((itemId) =>
-                  fetch(`/api/inventory/${itemId}/links`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ taskId: task.id }),
-                  })
-                )
-              );
+            if (!task) {
+              toast.error("Failed to create task");
+              return;
             }
+            if (linkedItemIds.length > 0) {
+              try {
+                const results = await Promise.all(
+                  linkedItemIds.map((itemId) =>
+                    fetch(`/api/inventory/${itemId}/links`, {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ taskId: task.id }),
+                    })
+                  )
+                );
+                const failed = results.filter((r) => !r.ok).length;
+                if (failed > 0) {
+                  toast.error(`Failed to link ${failed} inventory item(s)`);
+                }
+              } catch {
+                toast.error("Failed to link inventory items");
+              }
+            }
+            toast.success("Task created");
             setShowAddModal(false);
             fetchTasks();
           }}
@@ -173,7 +187,12 @@ export default function TasksPage() {
         <EditTaskModal
           task={editingTask}
           onSubmit={async (id, input) => {
-            await updateTask(id, input);
+            const result = await updateTask(id, input);
+            if (result) {
+              toast.success("Task updated");
+            } else {
+              toast.error("Failed to update task");
+            }
             setEditingTask(null);
           }}
           onClose={() => setEditingTask(null)}

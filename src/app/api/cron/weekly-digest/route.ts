@@ -159,10 +159,6 @@ async function handleDigest(request: Request) {
   }
 }
 
-export async function GET(request: Request) {
-  return handleDigest(request);
-}
-
 export async function POST(request: Request) {
   return handleDigest(request);
 }

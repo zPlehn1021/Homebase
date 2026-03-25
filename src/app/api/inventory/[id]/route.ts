@@ -7,6 +7,7 @@ import {
   tasks,
 } from "@/db/schema";
 import { getAuthenticatedUser } from "@/lib/auth-helpers";
+import { parseId } from "@/lib/validation";
 
 export const dynamic = "force-dynamic";
 
@@ -22,7 +23,10 @@ export async function GET(
   try {
     const { db, userId } = authResult;
     const { id } = await params;
-    const itemId = parseInt(id, 10);
+    const itemId = parseId(id);
+    if (!itemId) {
+      return Response.json({ error: "Invalid ID" }, { status: 400 });
+    }
 
     const item = await db
       .select()
@@ -85,7 +89,10 @@ export async function PATCH(
   try {
     const { db, userId } = authResult;
     const { id } = await params;
-    const itemId = parseInt(id, 10);
+    const itemId = parseId(id);
+    if (!itemId) {
+      return Response.json({ error: "Invalid ID" }, { status: 400 });
+    }
     const body = await request.json();
 
     // Verify ownership
@@ -157,7 +164,10 @@ export async function DELETE(
   try {
     const { db, userId } = authResult;
     const { id } = await params;
-    const itemId = parseInt(id, 10);
+    const itemId = parseId(id);
+    if (!itemId) {
+      return Response.json({ error: "Invalid ID" }, { status: 400 });
+    }
 
     // Verify ownership
     const current = await db

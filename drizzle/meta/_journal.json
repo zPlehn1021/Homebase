@@ -1,0 +1,34 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1774290681402,
+      "tag": "0000_nervous_fabian_cortez",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1774414965173,
+      "tag": "0001_nifty_shatterstar",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1774416497245,
+      "tag": "0002_sticky_archangel",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1774417685113,
+      "tag": "0003_parched_pandemic",
+      "breakpoints": true
+    }
+  ]
+}

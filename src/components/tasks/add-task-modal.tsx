@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import type { HomebaseSession } from "@/lib/auth.d";
@@ -40,7 +39,6 @@ export function AddTaskModal({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) return;
-    toast.success("Task created");
     onSubmit(
       {
         title: title.trim(),
@@ -168,6 +166,8 @@ export function AddTaskModal({
                 </span>
                 <input
                   type="number"
+                  min="0"
+                  step="1"
                   value={estimatedCost}
                   onChange={(e) => setEstimatedCost(e.target.value)}
                   placeholder="0"

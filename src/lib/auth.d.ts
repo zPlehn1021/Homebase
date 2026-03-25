@@ -11,6 +11,7 @@ export interface HomebaseUser {
   onboardingCompleted: boolean;
   propertyType: string | null;
   squareFootage: number | null;
+  isAdmin: boolean;
 }
 
 export interface HomebaseSession {

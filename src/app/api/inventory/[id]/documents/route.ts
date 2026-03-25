@@ -3,6 +3,7 @@ import { eq, and } from "drizzle-orm";
 import { put, del } from "@vercel/blob";
 import { inventoryItems, inventoryDocuments } from "@/db/schema";
 import { getAuthenticatedUser } from "@/lib/auth-helpers";
+import { parseId } from "@/lib/validation";
 
 export const dynamic = "force-dynamic";
 
@@ -18,7 +19,10 @@ export async function POST(
   try {
     const { db, userId } = authResult;
     const { id } = await params;
-    const itemId = parseInt(id, 10);
+    const itemId = parseId(id);
+    if (!itemId) {
+      return Response.json({ error: "Invalid ID" }, { status: 400 });
+    }
 
     // Verify ownership
     const item = await db
@@ -77,10 +81,16 @@ export async function DELETE(
   try {
     const { db, userId } = authResult;
     const { id } = await params;
-    const itemId = parseInt(id, 10);
+    const itemId = parseId(id);
+    if (!itemId) {
+      return Response.json({ error: "Invalid ID" }, { status: 400 });
+    }
 
     const searchParams = request.nextUrl.searchParams;
-    const docId = parseInt(searchParams.get("docId") || "0", 10);
+    const docId = parseId(searchParams.get("docId") || "");
+    if (!docId) {
+      return Response.json({ error: "Invalid document ID" }, { status: 400 });
+    }
 
     // Verify inventory item ownership
     const item = await db

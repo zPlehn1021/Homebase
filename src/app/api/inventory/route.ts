@@ -125,6 +125,18 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
 
+    // Verify parent belongs to user if specified
+    if (body.parentId) {
+      const parent = await db
+        .select({ id: inventoryItems.id })
+        .from(inventoryItems)
+        .where(and(eq(inventoryItems.id, body.parentId), eq(inventoryItems.userId, userId)))
+        .limit(1);
+      if (parent.length === 0) {
+        return Response.json({ error: "Parent item not found" }, { status: 404 });
+      }
+    }
+
     const result = await db
       .insert(inventoryItems)
       .values({

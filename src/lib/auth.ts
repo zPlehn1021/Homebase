@@ -87,6 +87,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           s.user.onboardingCompleted = dbUser[0].onboardingCompleted;
           s.user.propertyType = dbUser[0].propertyType;
           s.user.squareFootage = dbUser[0].squareFootage;
+          s.user.isAdmin = dbUser[0].isAdmin;
 
           // Auto-link: if user isn't verified, check for a matching purchase
           if (!dbUser[0].purchaseVerified && dbUser[0].email) {

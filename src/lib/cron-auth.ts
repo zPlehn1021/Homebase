@@ -1,3 +1,5 @@
+import { timingSafeEqual, createHmac } from "crypto";
+
 export function verifyCronSecret(request: Request): boolean {
   const secret = process.env.CRON_SECRET;
   if (!secret) return false;
@@ -6,5 +8,10 @@ export function verifyCronSecret(request: Request): boolean {
   if (!authHeader) return false;
 
   const token = authHeader.replace("Bearer ", "");
-  return token === secret;
+
+  // Hash both values to normalize length and prevent timing leaks
+  const tokenHash = createHmac("sha256", "cron").update(token).digest();
+  const secretHash = createHmac("sha256", "cron").update(secret).digest();
+
+  return timingSafeEqual(tokenHash, secretHash);
 }

@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { eq, and } from "drizzle-orm";
 import { inventoryItems, taskInventoryLinks, tasks } from "@/db/schema";
 import { getAuthenticatedUser } from "@/lib/auth-helpers";
+import { parseId } from "@/lib/validation";
 
 export const dynamic = "force-dynamic";
 
@@ -17,7 +18,10 @@ export async function POST(
   try {
     const { db, userId } = authResult;
     const { id } = await params;
-    const itemId = parseInt(id, 10);
+    const itemId = parseId(id);
+    if (!itemId) {
+      return Response.json({ error: "Invalid ID" }, { status: 400 });
+    }
     const body = await request.json();
 
     // Verify inventory item ownership
@@ -65,12 +69,18 @@ export async function DELETE(
   try {
     const { db, userId } = authResult;
     const { id } = await params;
-    const itemId = parseInt(id, 10);
+    const itemId = parseId(id);
+    if (!itemId) {
+      return Response.json({ error: "Invalid ID" }, { status: 400 });
+    }
 
     const searchParams = request.nextUrl.searchParams;
-    const taskId = parseInt(searchParams.get("taskId") || "0", 10);
+    const taskId = parseId(searchParams.get("taskId") || "");
+    if (!taskId) {
+      return Response.json({ error: "Invalid task ID" }, { status: 400 });
+    }
 
-    // Verify ownership
+    // Verify inventory item ownership
     const item = await db
       .select()
       .from(inventoryItems)
@@ -79,6 +89,17 @@ export async function DELETE(
 
     if (item.length === 0) {
       return Response.json({ error: "Item not found" }, { status: 404 });
+    }
+
+    // Verify task ownership
+    const task = await db
+      .select()
+      .from(tasks)
+      .where(and(eq(tasks.id, taskId), eq(tasks.userId, userId)))
+      .limit(1);
+
+    if (task.length === 0) {
+      return Response.json({ error: "Task not found" }, { status: 404 });
     }
 
     await db

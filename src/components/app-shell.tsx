@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Sidebar } from "./sidebar";
 import { PurchaseBanner } from "./purchase-banner";
+import { InstallPrompt } from "./install-prompt";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -52,6 +53,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <PurchaseBanner />
         <main id="main-content" className="flex-1 overflow-y-auto">{children}</main>
       </div>
+
+      <InstallPrompt />
     </div>
   );
 }
