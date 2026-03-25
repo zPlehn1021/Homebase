@@ -1,6 +1,7 @@
 "use client";
 
 import { useTasks } from "@/lib/hooks/use-tasks";
+import { useCompletions } from "@/lib/hooks/use-completions";
 import { computeTaskStatus } from "@/lib/utils";
 import { ActionRequired } from "@/components/dashboard/action-required";
 import { ComingUp } from "@/components/dashboard/coming-up";
@@ -31,7 +32,9 @@ function getSeasonalTip() {
 }
 
 export default function DashboardPage() {
-  const { tasks, loading } = useTasks();
+  const { tasks, loading: tasksLoading } = useTasks();
+  const { completions, loading: completionsLoading } = useCompletions();
+  const loading = tasksLoading || completionsLoading;
   const { user } = useUser();
   const { announcements, dismiss: dismissAnnouncement } = useAnnouncements();
   const firstName = user?.name?.split(" ")[0] || "there";
@@ -118,7 +121,7 @@ export default function DashboardPage() {
           />
 
           {/* Quick Stats */}
-          <QuickStats tasks={dashTasks} />
+          <QuickStats tasks={dashTasks} completions={completions} />
 
           {/* Action Required */}
           <ActionRequired tasks={dashTasks} />

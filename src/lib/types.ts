@@ -65,6 +65,19 @@ export interface UpdateTaskInput {
   snoozeDuration?: SnoozeDuration;
 }
 
+// ── Task Completion types ────────────────────────────────────────
+
+export interface TaskCompletion {
+  id: number;
+  taskId: number;
+  userId: number;
+  completedAt: string;
+  actualCost: number | null;
+  category: string;
+  title: string;
+  createdAt: string;
+}
+
 // ── Inventory types ─────────────────────────────────────────────
 
 export type InventoryCategory =

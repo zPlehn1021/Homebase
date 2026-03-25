@@ -1,19 +1,19 @@
-import type { Task, TaskCategory } from "@/lib/types";
-import { categoryIcons, categoryBarColors, computeTaskStatus } from "@/lib/utils";
+import type { TaskCompletion, TaskCategory } from "@/lib/types";
+import { categoryIcons, categoryBarColors } from "@/lib/utils";
 
-export function CategoryBreakdown({ tasks }: { tasks: Task[] }) {
-  const completed = tasks.filter(
-    (t) => computeTaskStatus(t.dueDate, t.completedAt) === "completed"
-  );
-
+export function CategoryBreakdown({
+  completions,
+}: {
+  completions: TaskCompletion[];
+}) {
   // Aggregate by category
   const categoryMap: Record<string, { count: number; cost: number }> = {};
-  for (const t of completed) {
-    if (!categoryMap[t.category]) {
-      categoryMap[t.category] = { count: 0, cost: 0 };
+  for (const c of completions) {
+    if (!categoryMap[c.category]) {
+      categoryMap[c.category] = { count: 0, cost: 0 };
     }
-    categoryMap[t.category].count++;
-    categoryMap[t.category].cost += t.actualCost || 0;
+    categoryMap[c.category].count++;
+    categoryMap[c.category].cost += c.actualCost || 0;
   }
 
   const categories = Object.entries(categoryMap)

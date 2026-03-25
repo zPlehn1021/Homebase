@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { eq, and } from "drizzle-orm";
-import { tasks, users } from "@/db/schema";
+import { tasks, users, taskCompletions } from "@/db/schema";
 import { getAuthenticatedUser } from "@/lib/auth-helpers";
 import { snoozeDueDate, advanceDueDate } from "@/lib/utils";
 import { parseId, validateCost } from "@/lib/validation";
@@ -55,6 +55,18 @@ export async function PATCH(
       }
 
       const task = current[0];
+      const completionCost = updates.actualCost as number | undefined;
+
+      // Log completion to history
+      await db.insert(taskCompletions).values({
+        taskId: task.id,
+        userId,
+        completedAt: new Date().toISOString(),
+        actualCost: completionCost ?? null,
+        category: task.category,
+        title: task.title,
+      });
+
       const nextDate = task.dueDate && task.frequency !== "one-time"
         ? advanceDueDate(task.dueDate, task.frequency as "monthly" | "quarterly" | "semi-annually" | "annually")
         : null;

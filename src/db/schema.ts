@@ -122,6 +122,25 @@ export const taskTemplates = sqliteTable("task_templates", {
   requiresFeature: text("requires_feature"),
 });
 
+// ── Task Completions (history log) ──────────────────────────────
+
+export const taskCompletions = sqliteTable("task_completions", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  taskId: integer("task_id")
+    .notNull()
+    .references(() => tasks.id, { onDelete: "cascade" }),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  completedAt: text("completed_at").notNull(),
+  actualCost: integer("actual_cost"),
+  category: text("category").notNull(),
+  title: text("title").notNull(),
+  createdAt: text("created_at")
+    .notNull()
+    .default(sql`(datetime('now'))`),
+});
+
 // ── Inventory tables ────────────────────────────────────────────
 
 export const inventoryItems = sqliteTable("inventory_items", {

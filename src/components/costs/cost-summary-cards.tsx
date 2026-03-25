@@ -1,20 +1,29 @@
-import type { Task } from "@/lib/types";
+import type { Task, TaskCompletion } from "@/lib/types";
 import { computeTaskStatus } from "@/lib/utils";
 
-export function CostSummaryCards({ tasks }: { tasks: Task[] }) {
-  const completed = tasks.filter(
-    (t) => computeTaskStatus(t.dueDate, t.completedAt) === "completed"
+export function CostSummaryCards({
+  tasks,
+  completions,
+}: {
+  tasks: Task[];
+  completions: TaskCompletion[];
+}) {
+  const totalSpent = completions.reduce(
+    (s, c) => s + (c.actualCost || 0),
+    0
   );
-  const totalSpent = completed.reduce((s, t) => s + (t.actualCost || 0), 0);
   const estimatedRemaining = tasks
     .filter(
       (t) => computeTaskStatus(t.dueDate, t.completedAt) !== "completed"
     )
     .reduce((s, t) => s + (t.estimatedCost || 0), 0);
-  const tasksWithCost = completed.filter(
-    (t) => t.actualCost && t.actualCost > 0
+  const completionsWithCost = completions.filter(
+    (c) => c.actualCost && c.actualCost > 0
   ).length;
-  const avgCost = tasksWithCost > 0 ? Math.round(totalSpent / tasksWithCost) : 0;
+  const avgCost =
+    completionsWithCost > 0
+      ? Math.round(totalSpent / completionsWithCost)
+      : 0;
 
   const stats = [
     {
@@ -36,8 +45,8 @@ export function CostSummaryCards({ tasks }: { tasks: Task[] }) {
       color: "bg-sage-50 border-sage-200",
     },
     {
-      label: "Tasks With Costs",
-      value: tasksWithCost.toString(),
+      label: "Tasks Completed",
+      value: completions.length.toString(),
       icon: "🧾",
       color: "bg-stone-50 border-stone-200",
     },

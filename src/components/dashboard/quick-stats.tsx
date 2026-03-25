@@ -1,13 +1,19 @@
 import { MockTask } from "@/lib/mock-data";
+import type { TaskCompletion } from "@/lib/types";
 
-export function QuickStats({ tasks }: { tasks: MockTask[] }) {
-  const completed = tasks.filter((t) => t.status === "completed");
+export function QuickStats({
+  tasks,
+  completions,
+}: {
+  tasks: MockTask[];
+  completions: TaskCompletion[];
+}) {
   const totalThisYear = tasks.length;
-  const completedCount = completed.length;
+  const completedCount = completions.length;
   const completionRate =
     totalThisYear > 0 ? Math.round((completedCount / totalThisYear) * 100) : 0;
-  const moneySpent = completed.reduce(
-    (sum, t) => sum + (t.actualCost || 0),
+  const moneySpent = completions.reduce(
+    (sum, c) => sum + (c.actualCost || 0),
     0
   );
 
