@@ -64,14 +64,9 @@ export async function POST(request: Request) {
       return Response.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    // Determine if this is a donation by checking product ID
-    const donationProductId = process.env.LEMONSQUEEZY_DONATION_PRODUCT_ID;
-    const firstItem = attributes.first_order_item;
-    const isDonation =
-      donationProductId &&
-      firstItem &&
-      String(firstItem.product_id) === donationProductId;
-    const purchaseType = isDonation ? "donation" : "purchase";
+    // FREE MODE: All orders are donations since the app is free.
+    // To re-enable paid purchases, check product ID to distinguish types.
+    const purchaseType = "donation" as const;
 
     // Idempotency check — skip if this order was already processed
     const existingPurchase = await db
@@ -102,19 +97,12 @@ export async function POST(request: Request) {
       type: purchaseType,
     });
 
-    // If user exists, update their status
+    // If user exists, mark them as a donor
     if (userId) {
-      if (isDonation) {
-        await db
-          .update(users)
-          .set({ hasDonated: true })
-          .where(eq(users.id, userId));
-      } else {
-        await db
-          .update(users)
-          .set({ purchaseVerified: true })
-          .where(eq(users.id, userId));
-      }
+      await db
+        .update(users)
+        .set({ hasDonated: true })
+        .where(eq(users.id, userId));
     }
 
     console.log(
