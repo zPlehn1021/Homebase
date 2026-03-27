@@ -81,21 +81,31 @@ export function AccountSection({
         </p>
       </div>
 
-      {/* Purchase Status */}
+      {/* Status */}
       <div className="space-y-2">
         <label className="text-sm font-semibold text-stone-700">
-          Plan status
+          Status
         </label>
-        {user.purchaseVerified ? (
+        <div className="flex items-center gap-2">
           <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-sage-50 border border-sage-200 text-xs font-medium text-sage-700">
             <span className="w-1.5 h-1.5 rounded-full bg-sage-500" />
-            Homebase Pro
+            Homebase
           </span>
-        ) : (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-xs font-medium text-amber-700">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-            Free Plan
-          </span>
+          {user.hasDonated && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-xs font-medium text-amber-700">
+              &#9825; Supporter
+            </span>
+          )}
+        </div>
+        {!user.hasDonated && (
+          <a
+            href={process.env.NEXT_PUBLIC_LEMONSQUEEZY_DONATION_URL || "/#pricing"}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-sage-600 hover:text-sage-700 font-medium"
+          >
+            Support Homebase &rarr;
+          </a>
         )}
       </div>
 

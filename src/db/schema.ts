@@ -30,6 +30,10 @@ export const users = sqliteTable("users", {
     .notNull()
     .default(false),
   isAdmin: integer("is_admin", { mode: "boolean" }).notNull().default(false),
+  hasDonated: integer("has_donated", { mode: "boolean" })
+    .notNull()
+    .default(false),
+  lastDonationPromptAt: text("last_donation_prompt_at"),
   emailVerified: integer("emailVerified", { mode: "timestamp_ms" }),
   image: text("image"),
 });
@@ -87,6 +91,9 @@ export const purchases = sqliteTable("purchases", {
   email: text("email").notNull(),
   lemonSqueezyOrderId: text("lemonsqueezy_order_id").notNull().unique(),
   amount: integer("amount"), // cents
+  type: text("type", { enum: ["purchase", "donation"] })
+    .notNull()
+    .default("purchase"),
   createdAt: text("created_at")
     .notNull()
     .default(sql`(datetime('now'))`),

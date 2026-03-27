@@ -92,6 +92,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           s.user.propertyType = dbUser[0].propertyType;
           s.user.squareFootage = dbUser[0].squareFootage;
           s.user.isAdmin = dbUser[0].isAdmin;
+          s.user.hasDonated = dbUser[0].hasDonated;
+
+          // FREE MODE: auto-grant pro status to all users
+          // To re-enable paywall, remove this block
+          if (!dbUser[0].purchaseVerified) {
+            await db
+              .update(users)
+              .set({ purchaseVerified: true })
+              .where(eq(users.id, dbUser[0].id));
+            s.user.purchaseVerified = true;
+          }
 
           // Auto-link: if user isn't verified, check for a matching purchase
           if (!dbUser[0].purchaseVerified && dbUser[0].email) {

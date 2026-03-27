@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { Sidebar } from "./sidebar";
-import { PurchaseBanner } from "./purchase-banner";
+import { DonationBanner } from "./donation-banner";
 import { InstallPrompt } from "./install-prompt";
+import { DonationPromptModal } from "./donation-prompt-modal";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -50,11 +51,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        <PurchaseBanner />
+        <DonationBanner />
         <main id="main-content" className="flex-1 overflow-y-auto">{children}</main>
       </div>
 
       <InstallPrompt />
+      <DonationPromptModal />
     </div>
   );
 }

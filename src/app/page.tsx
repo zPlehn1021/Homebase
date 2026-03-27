@@ -1,9 +1,10 @@
 import Link from "next/link";
+import Image from "next/image";
 import { LandingNav } from "@/components/landing/landing-nav";
 import { FAQSection } from "@/components/landing/faq-section";
 
-const CHECKOUT_URL =
-  process.env.NEXT_PUBLIC_LEMONSQUEEZY_CHECKOUT_URL || "/#pricing";
+const DONATION_URL =
+  process.env.NEXT_PUBLIC_LEMONSQUEEZY_DONATION_URL || "/#pricing";
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -12,129 +13,15 @@ const jsonLd = {
   applicationCategory: "LifestyleApplication",
   operatingSystem: "Web",
   description:
-    "Your personalized home maintenance plan. Seasonal reminders, cost tracking, and smart scheduling.",
+    "Your personalized home maintenance plan. Seasonal reminders, cost tracking, inventory management, and smart scheduling.",
   url: "https://homebase.app",
   offers: {
     "@type": "Offer",
-    price: "19.00",
+    price: "0",
     priceCurrency: "USD",
     availability: "https://schema.org/InStock",
   },
 };
-
-/* ─────────────────────── Hero Visual ─────────────────────── */
-
-function DashboardMockup() {
-  return (
-    <div className="relative mx-auto w-full max-w-md">
-      {/* Decorative glow */}
-      <div className="absolute -inset-4 bg-sage-100/60 rounded-3xl blur-2xl" />
-      <div className="relative bg-cream rounded-2xl border border-stone-200 shadow-xl overflow-hidden">
-        {/* Mock title bar */}
-        <div className="flex items-center gap-2 px-4 py-3 border-b border-stone-100 bg-white">
-          <span className="text-sm font-semibold text-stone-800">
-            🏡 Homebase
-          </span>
-          <span className="ml-auto text-[11px] text-stone-400">Dashboard</span>
-        </div>
-
-        {/* Mock stats row */}
-        <div className="grid grid-cols-3 gap-2 p-3">
-          {[
-            { label: "Due Soon", value: "3", color: "text-amber-600" },
-            { label: "Completed", value: "12", color: "text-sage-600" },
-            { label: "Saved", value: "$840", color: "text-sage-700" },
-          ].map((stat) => (
-            <div
-              key={stat.label}
-              className="bg-white rounded-xl border border-stone-100 p-2.5 text-center"
-            >
-              <p className={`text-lg font-bold ${stat.color}`}>{stat.value}</p>
-              <p className="text-[10px] text-stone-400 font-medium">
-                {stat.label}
-              </p>
-            </div>
-          ))}
-        </div>
-
-        {/* Mock task list */}
-        <div className="px-3 pb-3 space-y-2">
-          {[
-            {
-              title: "Clean gutters & downspouts",
-              due: "Mar 28",
-              badge: "Due Soon",
-              badgeClass: "bg-amber-50 text-amber-700",
-            },
-            {
-              title: "Test smoke detectors",
-              due: "Apr 1",
-              badge: "Upcoming",
-              badgeClass: "bg-sage-50 text-sage-700",
-            },
-            {
-              title: "HVAC filter replacement",
-              due: "Apr 5",
-              badge: "Upcoming",
-              badgeClass: "bg-sage-50 text-sage-700",
-            },
-            {
-              title: "Inspect water heater",
-              due: "Completed",
-              badge: "Done",
-              badgeClass: "bg-green-50 text-green-700",
-            },
-          ].map((task) => (
-            <div
-              key={task.title}
-              className="flex items-center gap-3 bg-white rounded-xl border border-stone-100 px-3 py-2.5"
-            >
-              <div
-                className={`w-5 h-5 rounded-md border-2 shrink-0 flex items-center justify-center ${
-                  task.badge === "Done"
-                    ? "border-green-400 bg-green-50"
-                    : "border-stone-200"
-                }`}
-              >
-                {task.badge === "Done" && (
-                  <svg
-                    width="10"
-                    height="10"
-                    viewBox="0 0 12 12"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    className="text-green-600"
-                  >
-                    <path d="M2 6l3 3 5-5" />
-                  </svg>
-                )}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p
-                  className={`text-xs font-medium truncate ${
-                    task.badge === "Done"
-                      ? "text-stone-400 line-through"
-                      : "text-stone-800"
-                  }`}
-                >
-                  {task.title}
-                </p>
-                <p className="text-[10px] text-stone-400">{task.due}</p>
-              </div>
-              <span
-                className={`shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full ${task.badgeClass}`}
-              >
-                {task.badge}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 /* ─────────────────────── Main Page ─────────────────────── */
 
@@ -145,62 +32,64 @@ export default function LandingPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <LandingNav checkoutUrl={CHECKOUT_URL} />
+      <LandingNav />
 
       {/* ════════════════════ HERO ════════════════════ */}
       <section className="relative overflow-hidden">
-        {/* Decorative background circles */}
+        {/* Decorative background */}
         <div className="absolute top-20 -left-32 w-96 h-96 rounded-full bg-sage-100/40 blur-3xl" />
         <div className="absolute top-40 -right-24 w-80 h-80 rounded-full bg-sage-50/60 blur-3xl" />
 
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-20 sm:pt-24 sm:pb-28">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            {/* Copy */}
-            <div className="text-center lg:text-left">
-              <h1 className="text-4xl sm:text-5xl lg:text-[3.4rem] font-bold text-stone-900 tracking-tight leading-[1.1]">
-                Your home remembers
-                <br />
-                <span className="text-sage-600">everything.</span>
-                <br />
-                <span className="text-stone-400 text-3xl sm:text-4xl lg:text-[2.6rem]">
-                  Now you can too.
-                </span>
-              </h1>
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12 sm:pt-24 sm:pb-16">
+          <div className="text-center max-w-3xl mx-auto">
+            <h1 className="text-4xl sm:text-5xl lg:text-[3.4rem] font-bold text-stone-900 tracking-tight leading-[1.1]">
+              Your home remembers
+              <br />
+              <span className="text-sage-600">everything.</span>
+              <br />
+              <span className="text-stone-400 text-3xl sm:text-4xl lg:text-[2.6rem]">
+                Now you can too.
+              </span>
+            </h1>
 
-              <p className="mt-6 text-lg text-stone-500 leading-relaxed max-w-lg mx-auto lg:mx-0">
-                Homebase builds a personalized maintenance plan for your home
-                and reminds you before small tasks become expensive problems.
-              </p>
+            <p className="mt-6 text-lg text-stone-500 leading-relaxed max-w-xl mx-auto">
+              Homebase builds a personalized maintenance plan for your home and
+              reminds you before small tasks become expensive problems.
+            </p>
 
-              <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
-                <a
-                  href={CHECKOUT_URL}
-                  className="inline-flex items-center justify-center px-7 py-3.5 rounded-2xl bg-sage-600 text-white font-semibold text-base hover:bg-sage-700 transition-colors shadow-md shadow-sage-600/20"
-                >
-                  Get Started &mdash; $19 Lifetime
-                </a>
-                <Link
-                  href="/login"
-                  className="inline-flex items-center justify-center px-7 py-3.5 rounded-2xl border-2 border-stone-200 text-stone-700 font-semibold text-base hover:border-sage-300 hover:text-sage-700 transition-colors"
-                >
-                  Try Free Preview
-                </Link>
-              </div>
-
-              <p className="mt-4 text-xs text-stone-400 text-center lg:text-left">
-                One payment. No subscriptions. Yours forever.
-              </p>
+            <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+              <Link
+                href="/login"
+                className="inline-flex items-center justify-center px-7 py-3.5 rounded-2xl bg-sage-600 text-white font-semibold text-base hover:bg-sage-700 transition-colors shadow-md shadow-sage-600/20"
+              >
+                Get Started &mdash; It&apos;s Free
+              </Link>
+              <a
+                href="#features"
+                className="inline-flex items-center justify-center px-7 py-3.5 rounded-2xl border-2 border-stone-200 text-stone-700 font-semibold text-base hover:border-sage-300 hover:text-sage-700 transition-colors"
+              >
+                Learn More
+              </a>
             </div>
 
-            {/* Mockup */}
-            <div className="hidden lg:block">
-              <DashboardMockup />
-            </div>
+            <p className="mt-4 text-xs text-stone-400">
+              100% free. No credit card required. Donations welcome.
+            </p>
           </div>
 
-          {/* Mobile mockup below */}
-          <div className="lg:hidden mt-12">
-            <DashboardMockup />
+          {/* Hero Screenshot */}
+          <div className="mt-12 relative">
+            <div className="absolute -inset-4 bg-sage-100/40 rounded-3xl blur-2xl" />
+            <div className="relative rounded-2xl border border-stone-200 shadow-2xl shadow-stone-900/10 overflow-hidden">
+              <Image
+                src="/screenshots/dashboard.png"
+                alt="Homebase dashboard showing maintenance tasks, completion stats, and action items"
+                width={1400}
+                height={900}
+                className="w-full h-auto"
+                priority
+              />
+            </div>
           </div>
         </div>
       </section>
@@ -217,83 +106,45 @@ export default function LandingPage() {
           </div>
 
           <div className="grid sm:grid-cols-3 gap-6 sm:gap-8">
-            {/* Pain point 1 */}
             <div className="bg-cream rounded-2xl border border-stone-200 p-6 text-center">
               <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#d97706"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="10" />
                   <path d="M12 6v6l4 2" />
                 </svg>
               </div>
-              <h3 className="text-base font-bold text-stone-800 mb-2">
-                Forgotten maintenance
-              </h3>
+              <h3 className="text-base font-bold text-stone-800 mb-2">Forgotten maintenance</h3>
               <p className="text-sm text-stone-500 leading-relaxed">
                 Most homeowners miss routine tasks until they become visible
                 problems. By then, a $50 fix has turned into a $5,000 repair.
               </p>
             </div>
 
-            {/* Pain point 2 */}
             <div className="bg-cream rounded-2xl border border-stone-200 p-6 text-center">
               <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-center">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#e11d48"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e11d48" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="10" />
                   <path d="M12 8v4M12 16h.01" />
                 </svg>
               </div>
-              <h3 className="text-base font-bold text-stone-800 mb-2">
-                Surprise repair costs
-              </h3>
+              <h3 className="text-base font-bold text-stone-800 mb-2">Surprise repair costs</h3>
               <p className="text-sm text-stone-500 leading-relaxed">
                 Without a plan, every breakdown is an emergency. You end up
-                paying premium prices for urgent fixes that could have been
-                prevented.
+                paying premium prices for urgent fixes that could have been prevented.
               </p>
             </div>
 
-            {/* Pain point 3 */}
             <div className="bg-cream rounded-2xl border border-stone-200 p-6 text-center">
               <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-stone-100 border border-stone-200 flex items-center justify-center">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#57534e"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#57534e" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="3" y="3" width="18" height="18" rx="3" />
                   <path d="M3 9h18M9 3v18" />
                 </svg>
               </div>
-              <h3 className="text-base font-bold text-stone-800 mb-2">
-                No system to track it all
-              </h3>
+              <h3 className="text-base font-bold text-stone-800 mb-2">No system to track it all</h3>
               <p className="text-sm text-stone-500 leading-relaxed">
                 Sticky notes and mental checklists don&apos;t scale. Your home
-                has dozens of systems that each need attention on different
-                schedules.
+                has dozens of systems that each need attention on different schedules.
               </p>
             </div>
           </div>
@@ -303,7 +154,7 @@ export default function LandingPage() {
       {/* ════════════════════ FEATURES ════════════════════ */}
       <section id="features" className="scroll-mt-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-24">
-          <div className="text-center max-w-2xl mx-auto mb-14">
+          <div className="text-center max-w-2xl mx-auto mb-16">
             <p className="text-sm font-semibold text-sage-600 tracking-wide uppercase mb-3">
               Features
             </p>
@@ -314,106 +165,206 @@ export default function LandingPage() {
             </h2>
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-6">
-            {/* Feature 1: Seasonal */}
-            <div className="bg-white rounded-2xl border border-stone-200 p-6 sm:p-8">
+          {/* Feature 1: Task Management */}
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center mb-24">
+            <div>
               <div className="w-11 h-11 rounded-xl bg-sage-50 border border-sage-200 flex items-center justify-center mb-5">
-                <svg
-                  width="22"
-                  height="22"
-                  viewBox="0 0 22 22"
-                  fill="none"
-                  stroke="#5e6c51"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#5e6c51" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="3" y="4" width="16" height="15" rx="2" />
                   <path d="M3 9h16M7 2v4M15 2v4" />
                   <path d="M8 13h2M12 13h2" />
                 </svg>
               </div>
-              <h3 className="text-lg font-bold text-stone-800 mb-2">
-                Know what your home needs each season
+              <h3 className="text-2xl font-bold text-stone-800 mb-3">
+                Personalized task management
               </h3>
-              <p className="text-sm text-stone-500 leading-relaxed">
-                Homebase maps every maintenance task to the right time of year.
-                Spring gutter cleaning, fall furnace tune-ups, winter pipe
-                protection — all scheduled automatically.
+              <p className="text-base text-stone-500 leading-relaxed mb-4">
+                Homebase generates a complete maintenance plan based on your
+                specific home. Filter by category, track due dates, and never
+                miss a seasonal task again. Add your own custom tasks alongside
+                the auto-generated ones.
               </p>
-              {/* Mini illustration */}
-              <div className="mt-5 flex gap-2">
-                {["Spring", "Summer", "Fall", "Winter"].map((s, i) => (
-                  <div
-                    key={s}
-                    className={`flex-1 rounded-lg py-2 text-center text-[10px] font-semibold ${
-                      i === 0
-                        ? "bg-sage-100 text-sage-700 ring-2 ring-sage-300"
-                        : "bg-stone-50 text-stone-400"
-                    }`}
-                  >
-                    {s}
-                  </div>
+              <ul className="space-y-2">
+                {[
+                  "Auto-generated tasks for your home type",
+                  "Filter by plumbing, HVAC, electrical, and more",
+                  "Track overdue, upcoming, and completed tasks",
+                  "Add unlimited custom tasks",
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-2.5 text-sm text-stone-600">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0 mt-0.5">
+                      <circle cx="8" cy="8" r="8" fill="#f6f7f5" />
+                      <path d="M5 8l2 2 4-4" stroke="#5e6c51" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    {item}
+                  </li>
                 ))}
+              </ul>
+            </div>
+            <div className="relative">
+              <div className="absolute -inset-3 bg-sage-100/30 rounded-2xl blur-xl" />
+              <div className="relative rounded-2xl border border-stone-200 shadow-xl overflow-hidden">
+                <Image
+                  src="/screenshots/tasks.png"
+                  alt="My Tasks view showing categorized maintenance tasks with filters and due dates"
+                  width={1400}
+                  height={900}
+                  className="w-full h-auto"
+                />
               </div>
             </div>
+          </div>
 
-            {/* Feature 2: Cost Tracking */}
-            <div className="bg-white rounded-2xl border border-stone-200 p-6 sm:p-8">
+          {/* Feature 2: Inventory */}
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center mb-24">
+            <div className="lg:order-2">
               <div className="w-11 h-11 rounded-xl bg-sage-50 border border-sage-200 flex items-center justify-center mb-5">
-                <svg
-                  width="22"
-                  height="22"
-                  viewBox="0 0 22 22"
-                  fill="none"
-                  stroke="#5e6c51"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#5e6c51" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 7l8-4 8 4M3 7v8l8 4M3 7l8 4M19 7v8l-8 4M19 7l-8 4M11 11v8" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold text-stone-800 mb-3">
+                Home inventory tracking
+              </h3>
+              <p className="text-base text-stone-500 leading-relaxed mb-4">
+                Keep a detailed record of every major system, appliance, and
+                piece of equipment in your home. Track manufacturers, model
+                numbers, conditions, locations, and purchase dates — all in one
+                place.
+              </p>
+              <ul className="space-y-2">
+                {[
+                  "Track appliances, HVAC, plumbing, and more",
+                  "Record manufacturer, model, and serial numbers",
+                  "Monitor condition from new to needs replacement",
+                  "Link inventory items to maintenance tasks",
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-2.5 text-sm text-stone-600">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0 mt-0.5">
+                      <circle cx="8" cy="8" r="8" fill="#f6f7f5" />
+                      <path d="M5 8l2 2 4-4" stroke="#5e6c51" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="relative lg:order-1">
+              <div className="absolute -inset-3 bg-sage-100/30 rounded-2xl blur-xl" />
+              <div className="relative rounded-2xl border border-stone-200 shadow-xl overflow-hidden">
+                <Image
+                  src="/screenshots/inventory.png"
+                  alt="Inventory page showing home equipment, appliances, and systems with conditions and locations"
+                  width={1400}
+                  height={900}
+                  className="w-full h-auto"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Feature 3: Schedule */}
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center mb-24">
+            <div>
+              <div className="w-11 h-11 rounded-xl bg-sage-50 border border-sage-200 flex items-center justify-center mb-5">
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#5e6c51" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="4" width="16" height="15" rx="2" />
+                  <path d="M3 9h16M7 2v4M15 2v4" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold text-stone-800 mb-3">
+                Visual maintenance calendar
+              </h3>
+              <p className="text-base text-stone-500 leading-relaxed mb-4">
+                See your entire maintenance schedule at a glance with a
+                color-coded calendar. Spot overdue tasks, upcoming due dates,
+                and plan your weekends around what your home actually needs.
+              </p>
+              <ul className="space-y-2">
+                {[
+                  "Monthly calendar with task indicators",
+                  "Color-coded by status: overdue, due soon, upcoming",
+                  "Switch between calendar and list views",
+                  "Plan maintenance around your schedule",
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-2.5 text-sm text-stone-600">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0 mt-0.5">
+                      <circle cx="8" cy="8" r="8" fill="#f6f7f5" />
+                      <path d="M5 8l2 2 4-4" stroke="#5e6c51" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="relative">
+              <div className="absolute -inset-3 bg-sage-100/30 rounded-2xl blur-xl" />
+              <div className="relative rounded-2xl border border-stone-200 shadow-xl overflow-hidden">
+                <Image
+                  src="/screenshots/schedule.png"
+                  alt="Schedule calendar view showing monthly maintenance tasks with color-coded indicators"
+                  width={1400}
+                  height={900}
+                  className="w-full h-auto"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Feature 4: Cost Tracking */}
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center mb-24">
+            <div className="lg:order-2">
+              <div className="w-11 h-11 rounded-xl bg-sage-50 border border-sage-200 flex items-center justify-center mb-5">
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#5e6c51" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="11" cy="11" r="8" />
                   <path d="M11 7v8M9 9.5a2 2 0 012-1.5h1a1.5 1.5 0 010 3h-2a1.5 1.5 0 000 3h1a2 2 0 002-1.5" />
                 </svg>
               </div>
-              <h3 className="text-lg font-bold text-stone-800 mb-2">
-                See where every dollar goes
+              <h3 className="text-2xl font-bold text-stone-800 mb-3">
+                Cost tracking &amp; spending insights
               </h3>
-              <p className="text-sm text-stone-500 leading-relaxed">
-                Track estimated and actual costs for every task. See yearly
-                spending by category and understand your home&apos;s true cost
-                of ownership — no surprises.
+              <p className="text-base text-stone-500 leading-relaxed mb-4">
+                Understand the true cost of homeownership. Track what you spend
+                on maintenance, see category breakdowns, and compare spending
+                year over year to budget smarter.
               </p>
-              {/* Mini illustration */}
-              <div className="mt-5 flex items-end gap-1.5 h-12">
-                {[35, 55, 25, 70, 45, 60, 30, 50, 40, 65, 35, 55].map(
-                  (h, i) => (
-                    <div
-                      key={i}
-                      className="flex-1 rounded-t bg-sage-200"
-                      style={{ height: `${h}%` }}
-                    />
-                  )
-                )}
-              </div>
-              <div className="flex justify-between mt-1">
-                <span className="text-[9px] text-stone-300">Jan</span>
-                <span className="text-[9px] text-stone-300">Dec</span>
+              <ul className="space-y-2">
+                {[
+                  "Track total spending and per-task costs",
+                  "See completion rate and task stats",
+                  "Category-based spending breakdown",
+                  "Year-over-year comparison as data grows",
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-2.5 text-sm text-stone-600">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0 mt-0.5">
+                      <circle cx="8" cy="8" r="8" fill="#f6f7f5" />
+                      <path d="M5 8l2 2 4-4" stroke="#5e6c51" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="relative lg:order-1">
+              <div className="absolute -inset-3 bg-sage-100/30 rounded-2xl blur-xl" />
+              <div className="relative rounded-2xl border border-stone-200 shadow-xl overflow-hidden">
+                <Image
+                  src="/screenshots/costs.png"
+                  alt="Costs page showing spending breakdown, completion rates, and yearly comparisons"
+                  width={1400}
+                  height={900}
+                  className="w-full h-auto"
+                />
               </div>
             </div>
+          </div>
 
-            {/* Feature 3: Smart Reminders */}
+          {/* Feature 5 & 6: Smaller feature cards */}
+          <div className="grid sm:grid-cols-2 gap-6">
+            {/* Smart Reminders */}
             <div className="bg-white rounded-2xl border border-stone-200 p-6 sm:p-8">
               <div className="w-11 h-11 rounded-xl bg-sage-50 border border-sage-200 flex items-center justify-center mb-5">
-                <svg
-                  width="22"
-                  height="22"
-                  viewBox="0 0 22 22"
-                  fill="none"
-                  stroke="#5e6c51"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#5e6c51" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M11 3a6 6 0 016 6c0 3.09-1.13 5.82-3 7h-6c-1.87-1.18-3-3.91-3-7a6 6 0 016-6z" />
                   <path d="M9 16v1a2 2 0 004 0v-1" />
                   <path d="M11 3V1" />
@@ -427,7 +378,6 @@ export default function LandingPage() {
                 week before. Get a weekly digest of what&apos;s coming up so
                 nothing falls through the cracks.
               </p>
-              {/* Mini illustration */}
               <div className="mt-5 bg-sage-50 rounded-xl border border-sage-100 px-4 py-3">
                 <div className="flex items-center gap-2.5">
                   <div className="w-7 h-7 rounded-lg bg-sage-200 flex items-center justify-center">
@@ -443,19 +393,10 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Feature 4: Personalized */}
+            {/* Personalized */}
             <div className="bg-white rounded-2xl border border-stone-200 p-6 sm:p-8">
               <div className="w-11 h-11 rounded-xl bg-sage-50 border border-sage-200 flex items-center justify-center mb-5">
-                <svg
-                  width="22"
-                  height="22"
-                  viewBox="0 0 22 22"
-                  fill="none"
-                  stroke="#5e6c51"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#5e6c51" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M3 11.5L11 5l8 6.5" />
                   <path d="M5 10v7a1 1 0 001 1h4v-5h2v5h4a1 1 0 001-1v-7" />
                 </svg>
@@ -465,21 +406,17 @@ export default function LandingPage() {
               </h3>
               <p className="text-sm text-stone-500 leading-relaxed">
                 Tell us about your property — type, age, square footage, and
-                systems like HVAC, pool, or septic. We generate a plan that
-                fits your home, not a generic checklist.
+                systems like HVAC, pool, or septic. We generate a plan that fits
+                your home, not a generic checklist.
               </p>
-              {/* Mini illustration */}
-              <div className="mt-5 flex flex-wrap gap-1.5">
-                {["🏠 House", "📅 Built 2005", "📐 2,400 sqft", "❄️ HVAC", "🏊 Pool"].map(
-                  (tag) => (
-                    <span
-                      key={tag}
-                      className="text-[10px] font-medium bg-stone-100 text-stone-600 px-2.5 py-1 rounded-full"
-                    >
-                      {tag}
-                    </span>
-                  )
-                )}
+              <div className="mt-5 relative rounded-xl border border-stone-200 shadow-sm overflow-hidden">
+                <Image
+                  src="/screenshots/settings.png"
+                  alt="Settings page showing home profile customization options"
+                  width={700}
+                  height={450}
+                  className="w-full h-auto"
+                />
               </div>
             </div>
           </div>
@@ -499,73 +436,42 @@ export default function LandingPage() {
           </div>
 
           <div className="grid sm:grid-cols-3 gap-8 sm:gap-6 relative">
-            {/* Connector line (desktop) */}
             <div className="hidden sm:block absolute top-14 left-[20%] right-[20%] h-px border-t-2 border-dashed border-stone-200" />
 
             {[
               {
                 step: "1",
                 icon: (
-                  <svg
-                    width="28"
-                    height="28"
-                    viewBox="0 0 28 28"
-                    fill="none"
-                    stroke="#5e6c51"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
+                  <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="#5e6c51" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M4 14.5L14 8l10 6.5" />
                     <path d="M6 13v8a1 1 0 001 1h5v-5h4v5h5a1 1 0 001-1v-8" />
                   </svg>
                 ),
                 title: "Tell us about your home",
-                description:
-                  "Property type, age, size, and systems. Takes about 2 minutes.",
+                description: "Property type, age, size, and systems. Takes about 2 minutes.",
               },
               {
                 step: "2",
                 icon: (
-                  <svg
-                    width="28"
-                    height="28"
-                    viewBox="0 0 28 28"
-                    fill="none"
-                    stroke="#5e6c51"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
+                  <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="#5e6c51" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="4" y="5" width="20" height="18" rx="3" />
                     <path d="M4 11h20M10 3v4M18 3v4" />
                     <path d="M10 15l2.5 2.5L17 13" />
                   </svg>
                 ),
                 title: "Get your personalized plan",
-                description:
-                  "We generate a year-round maintenance schedule tailored to your home.",
+                description: "We generate a year-round maintenance schedule tailored to your home.",
               },
               {
                 step: "3",
                 icon: (
-                  <svg
-                    width="28"
-                    height="28"
-                    viewBox="0 0 28 28"
-                    fill="none"
-                    stroke="#5e6c51"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
+                  <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="#5e6c51" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                     <circle cx="14" cy="14" r="10" />
                     <path d="M10 14l3 3 5-5" />
                   </svg>
                 ),
                 title: "Stay on top of maintenance",
-                description:
-                  "Check off tasks, track costs, and get reminders so nothing slips.",
+                description: "Check off tasks, track costs, and get reminders so nothing slips.",
               },
             ].map((item) => (
               <div key={item.step} className="text-center relative">
@@ -575,9 +481,7 @@ export default function LandingPage() {
                 <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-sage-600 text-white text-xs font-bold flex items-center justify-center z-20">
                   {item.step}
                 </div>
-                <h3 className="text-base font-bold text-stone-800 mb-2">
-                  {item.title}
-                </h3>
+                <h3 className="text-base font-bold text-stone-800 mb-2">{item.title}</h3>
                 <p className="text-sm text-stone-500 leading-relaxed max-w-xs mx-auto">
                   {item.description}
                 </p>
@@ -595,55 +499,42 @@ export default function LandingPage() {
               Pricing
             </p>
             <h2 className="text-3xl sm:text-4xl font-bold text-stone-900 tracking-tight">
-              One price. No surprises.
+              Free for everyone.
             </h2>
             <p className="mt-3 text-stone-500">
-              Just like your home maintenance should be.
+              Every feature, every tool, no credit card required.
             </p>
           </div>
 
           <div className="max-w-md mx-auto">
             <div className="bg-white rounded-2xl border-2 border-sage-600 shadow-xl shadow-sage-600/10 overflow-hidden">
-              {/* Price header */}
               <div className="bg-sage-600 px-6 py-8 text-center">
                 <p className="text-sage-200 text-sm font-semibold uppercase tracking-wide mb-2">
-                  Lifetime Access
+                  Full Access
                 </p>
-                <p className="text-5xl font-bold text-white">$19</p>
+                <p className="text-5xl font-bold text-white">Free</p>
                 <p className="text-sage-200 text-sm mt-2">
-                  One payment, yours forever
+                  Everything included, no strings attached
                 </p>
               </div>
 
-              {/* Features list */}
               <div className="px-6 py-8">
                 <ul className="space-y-3.5">
                   {[
                     "Personalized maintenance plan",
                     "Seasonal task scheduling",
+                    "Home inventory management",
                     "Email reminders & weekly digest",
                     "Cost tracking & yearly reports",
+                    "Visual maintenance calendar",
                     "Unlimited custom tasks",
-                    "Data export anytime",
                     "Works on any device",
                     "All future updates included",
                   ].map((item) => (
                     <li key={item} className="flex items-start gap-3">
-                      <svg
-                        width="18"
-                        height="18"
-                        viewBox="0 0 18 18"
-                        fill="none"
-                        className="shrink-0 mt-0.5"
-                      >
+                      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" className="shrink-0 mt-0.5">
                         <circle cx="9" cy="9" r="9" fill="#f6f7f5" />
-                        <path
-                          d="M5.5 9l2.5 2.5 4.5-4.5"
-                          stroke="#5e6c51"
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
+                        <path d="M5.5 9l2.5 2.5 4.5-4.5" stroke="#5e6c51" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                       <span className="text-sm text-stone-700">{item}</span>
                     </li>
@@ -651,23 +542,26 @@ export default function LandingPage() {
                 </ul>
 
                 <div className="mt-8 space-y-3">
-                  <a
-                    href={CHECKOUT_URL}
+                  <Link
+                    href="/login"
                     className="block w-full text-center px-6 py-3.5 rounded-2xl bg-sage-600 text-white font-semibold text-base hover:bg-sage-700 transition-colors shadow-md shadow-sage-600/20"
                   >
-                    Get Homebase &mdash; $19
-                  </a>
-                  <p className="text-center text-xs text-stone-400">
-                    30-day money-back guarantee
-                  </p>
+                    Get Started Free
+                  </Link>
                 </div>
               </div>
 
-              {/* Emphasis bar */}
-              <div className="bg-sage-50 border-t border-sage-100 px-6 py-4 text-center">
-                <p className="text-sm font-semibold text-sage-700">
-                  No subscriptions. No monthly fees. Pay once, yours forever.
+              <div className="bg-sage-50 border-t border-sage-100 px-6 py-5 text-center">
+                <p className="text-sm text-stone-600 mb-3">
+                  Love Homebase? Help keep it free for everyone.
                 </p>
+                <a
+                  href={DONATION_URL}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border-2 border-sage-300 text-sage-700 text-sm font-semibold hover:bg-sage-100 transition-colors"
+                >
+                  <span>&#9825;</span>
+                  Support Homebase
+                </a>
               </div>
             </div>
           </div>
@@ -701,18 +595,18 @@ export default function LandingPage() {
             Join homeowners who never miss a maintenance task again.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <a
-              href={CHECKOUT_URL}
-              className="inline-flex items-center justify-center px-7 py-3.5 rounded-2xl bg-sage-600 text-white font-semibold text-base hover:bg-sage-700 transition-colors shadow-md shadow-sage-600/20"
-            >
-              Get Started &mdash; $19 Lifetime
-            </a>
             <Link
               href="/login"
+              className="inline-flex items-center justify-center px-7 py-3.5 rounded-2xl bg-sage-600 text-white font-semibold text-base hover:bg-sage-700 transition-colors shadow-md shadow-sage-600/20"
+            >
+              Get Started Free
+            </Link>
+            <a
+              href={DONATION_URL}
               className="inline-flex items-center justify-center px-7 py-3.5 rounded-2xl border-2 border-stone-200 bg-white text-stone-700 font-semibold text-base hover:border-sage-300 hover:text-sage-700 transition-colors"
             >
-              Try Free Preview
-            </Link>
+              Support Homebase
+            </a>
           </div>
         </div>
       </section>
@@ -723,28 +617,17 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <span className="text-lg">🏡</span>
-              <span className="text-sm font-semibold text-stone-700">
-                Homebase
-              </span>
+              <span className="text-sm font-semibold text-stone-700">Homebase</span>
             </div>
 
             <div className="flex flex-wrap items-center justify-center gap-6">
-              <Link
-                href="/privacy"
-                className="text-xs text-stone-400 hover:text-stone-600 transition-colors"
-              >
+              <Link href="/privacy" className="text-xs text-stone-400 hover:text-stone-600 transition-colors">
                 Privacy Policy
               </Link>
-              <Link
-                href="/terms"
-                className="text-xs text-stone-400 hover:text-stone-600 transition-colors"
-              >
+              <Link href="/terms" className="text-xs text-stone-400 hover:text-stone-600 transition-colors">
                 Terms of Service
               </Link>
-              <a
-                href="mailto:hello@homebase.app"
-                className="text-xs text-stone-400 hover:text-stone-600 transition-colors"
-              >
+              <a href="mailto:hello@homebase.app" className="text-xs text-stone-400 hover:text-stone-600 transition-colors">
                 Contact
               </a>
             </div>

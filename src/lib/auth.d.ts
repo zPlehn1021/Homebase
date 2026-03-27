@@ -12,6 +12,7 @@ export interface HomebaseUser {
   propertyType: string | null;
   squareFootage: number | null;
   isAdmin: boolean;
+  hasDonated: boolean;
 }
 
 export interface HomebaseSession {

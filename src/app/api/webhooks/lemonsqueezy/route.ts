@@ -64,6 +64,15 @@ export async function POST(request: Request) {
       return Response.json({ error: "Missing required fields" }, { status: 400 });
     }
 
+    // Determine if this is a donation by checking product ID
+    const donationProductId = process.env.LEMONSQUEEZY_DONATION_PRODUCT_ID;
+    const firstItem = attributes.first_order_item;
+    const isDonation =
+      donationProductId &&
+      firstItem &&
+      String(firstItem.product_id) === donationProductId;
+    const purchaseType = isDonation ? "donation" : "purchase";
+
     // Idempotency check — skip if this order was already processed
     const existingPurchase = await db
       .select({ id: purchases.id })
@@ -90,21 +99,29 @@ export async function POST(request: Request) {
       email: customerEmail.toLowerCase(),
       lemonSqueezyOrderId: orderId,
       amount: totalCents,
+      type: purchaseType,
     });
 
-    // If user exists, mark them as verified
+    // If user exists, update their status
     if (userId) {
-      await db
-        .update(users)
-        .set({ purchaseVerified: true })
-        .where(eq(users.id, userId));
+      if (isDonation) {
+        await db
+          .update(users)
+          .set({ hasDonated: true })
+          .where(eq(users.id, userId));
+      } else {
+        await db
+          .update(users)
+          .set({ purchaseVerified: true })
+          .where(eq(users.id, userId));
+      }
     }
 
     console.log(
-      `LemonSqueezy purchase processed: order=${orderId} email=${customerEmail} userId=${userId}`
+      `LemonSqueezy ${purchaseType} processed: order=${orderId} email=${customerEmail} userId=${userId}`
     );
 
-    return Response.json({ received: true, verified: !!userId });
+    return Response.json({ received: true, type: purchaseType, verified: !!userId });
   } catch (error) {
     console.error("LemonSqueezy webhook error:", error);
     return Response.json({ error: "Internal server error" }, { status: 500 });

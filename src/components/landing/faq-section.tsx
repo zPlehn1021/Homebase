@@ -29,9 +29,9 @@ const faqs = [
       "Nope. Homebase is a web app that works in any modern browser on desktop, tablet, or phone. There's nothing to download or install — just sign in and go.",
   },
   {
-    question: "What if I want a refund?",
+    question: "How is Homebase free?",
     answer:
-      "We offer a 30-day money-back guarantee, no questions asked. If Homebase isn't right for you, just reach out and we'll process your refund.",
+      "We believe every homeowner deserves great maintenance tools. Homebase is funded by optional donations from users who find it valuable. If you love it, consider supporting the project — but there's no obligation.",
   },
 ];
 

@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 
-export function LandingNav({ checkoutUrl }: { checkoutUrl: string }) {
+// Free-with-donations model — nav links to /login instead of checkout
+export function LandingNav() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
@@ -44,12 +45,12 @@ export function LandingNav({ checkoutUrl }: { checkoutUrl: string }) {
             >
               Log In
             </Link>
-            <a
-              href={checkoutUrl}
+            <Link
+              href="/login"
               className="px-4 py-2 rounded-xl bg-sage-600 text-white text-sm font-semibold hover:bg-sage-700 transition-colors shadow-sm"
             >
-              Get Started
-            </a>
+              Get Started Free
+            </Link>
           </div>
 
           {/* Mobile hamburger */}
@@ -114,12 +115,12 @@ export function LandingNav({ checkoutUrl }: { checkoutUrl: string }) {
           >
             Log In
           </Link>
-          <a
-            href={checkoutUrl}
+          <Link
+            href="/login"
             className="block mt-2 text-center px-4 py-2.5 rounded-xl bg-sage-600 text-white text-sm font-semibold hover:bg-sage-700 transition-colors"
           >
-            Get Started
-          </a>
+            Get Started Free
+          </Link>
         </div>
       )}
     </nav>

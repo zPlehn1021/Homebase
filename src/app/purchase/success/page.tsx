@@ -1,13 +1,14 @@
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import type { Metadata } from "next";
+export default async function PurchaseSuccessPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ type?: string }>;
+}) {
+  const params = await searchParams;
+  const isDonation = params.type === "donation";
 
-export const metadata: Metadata = {
-  title: "Purchase Successful",
-};
-
-export default async function PurchaseSuccessPage() {
   // Check if the user is already logged in
   const session = await auth();
   const isLoggedIn = !!session?.user;
@@ -42,10 +43,14 @@ export default async function PurchaseSuccessPage() {
         {/* Heading */}
         <div>
           <h1 className="text-2xl font-bold text-stone-900 tracking-tight">
-            Thank you for your purchase!
+            {isDonation
+              ? "Thank you for your support!"
+              : "Thank you for your purchase!"}
           </h1>
           <p className="mt-2 text-stone-500">
-            You now have lifetime access to Homebase.
+            {isDonation
+              ? "Your donation helps keep Homebase free for everyone. We truly appreciate it."
+              : "You now have lifetime access to Homebase."}
           </p>
         </div>
 
@@ -58,51 +63,43 @@ export default async function PurchaseSuccessPage() {
                 Check your email
               </p>
               <p className="text-xs text-stone-500 mt-0.5">
-                LemonSqueezy has sent you a receipt. Your purchase is being
-                verified automatically.
+                {isDonation
+                  ? "LemonSqueezy has sent you a receipt for your donation."
+                  : "LemonSqueezy has sent you a receipt. Your purchase is being verified automatically."}
               </p>
             </div>
           </div>
 
-          <div className="flex items-start gap-3">
-            <span className="text-lg">🔑</span>
-            <div>
-              <p className="text-sm font-semibold text-stone-800">
-                Sign in with the same email
-              </p>
-              <p className="text-xs text-stone-500 mt-0.5">
-                Use the email address from your purchase to sign in. Your
-                account will be activated automatically.
-              </p>
+          {!isDonation && (
+            <div className="flex items-start gap-3">
+              <span className="text-lg">🔑</span>
+              <div>
+                <p className="text-sm font-semibold text-stone-800">
+                  Sign in with the same email
+                </p>
+                <p className="text-xs text-stone-500 mt-0.5">
+                  Use the email address from your purchase to sign in. Your
+                  account will be activated automatically.
+                </p>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* CTA */}
         {isLoggedIn ? (
-          <div className="space-y-3">
-            <p className="text-sm text-stone-500">
-              Your purchase is being verified. This usually takes just a moment.
-            </p>
-            <Link
-              href="/dashboard"
-              className="inline-flex items-center justify-center w-full px-6 py-3 rounded-xl bg-sage-600 text-white font-semibold hover:bg-sage-700 transition-colors"
-            >
-              Go to Dashboard
-            </Link>
-            <button
-              onClick={undefined}
-              className="text-sm text-sage-600 hover:text-sage-700 font-medium"
-            >
-              <Link href="/purchase/success">Refresh to check status</Link>
-            </button>
-          </div>
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center justify-center w-full px-6 py-3 rounded-xl bg-sage-600 text-white font-semibold hover:bg-sage-700 transition-colors"
+          >
+            Go to Dashboard
+          </Link>
         ) : (
           <Link
             href="/login"
             className="inline-flex items-center justify-center w-full px-6 py-3 rounded-xl bg-sage-600 text-white font-semibold hover:bg-sage-700 transition-colors"
           >
-            Sign In to Access Your Planner
+            {isDonation ? "Sign In to Homebase" : "Sign In to Access Your Planner"}
           </Link>
         )}
 

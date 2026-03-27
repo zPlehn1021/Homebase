@@ -26,6 +26,7 @@ export async function GET() {
         reminderFrequency: users.reminderFrequency,
         weeklyDigest: users.weeklyDigest,
         purchaseVerified: users.purchaseVerified,
+        hasDonated: users.hasDonated,
         image: users.image,
         createdAt: users.createdAt,
       })

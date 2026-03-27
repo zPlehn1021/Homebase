@@ -12,6 +12,7 @@ export interface User {
   homeFeatures: string[] | null;
   onboardingCompleted: boolean;
   purchaseVerified: boolean;
+  hasDonated: boolean;
   emailReminders: boolean;
   reminderFrequency: string[] | null;
   weeklyDigest: boolean;
